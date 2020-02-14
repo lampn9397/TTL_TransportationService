@@ -1,12 +1,13 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
 import React from 'react';
-import axios from 'axios';
+import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 
 // Variables
 import './styles';
+import ActionTypes from '../../redux/AuthModule/action';
 
-export default class Login extends React.Component {
+class Login extends React.Component {
   state = {
     username: 'thuan',
     password: '12345',
@@ -19,31 +20,11 @@ export default class Login extends React.Component {
   }
 
   onClickLogin = async (e) => {
-    try {
-      const { username, password } = this.state;
-      console.log("TCL: Login -> onClickLogin -> username, password", username, password)
+    const { login } = this.props;
 
-      const body = JSON.stringify({ username, password });
+    const { username, password } = this.state;
 
-      const response = await fetch('https://8cfd98a1.ngrok.io/api/users/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body,
-        redirect: 'follow'
-      });
-
-      // const response = await axios.post('https://8cfd98a1.ngrok.io/api/users/login', body, { headers: { 'Content-Type': 'application/json' } });
-
-      console.log("TCL: Login -> onClickLogin -> response", response)
-
-      // const json = await response.json();
-
-      // const result = await response.text();
-      // console.log("TCL: Login -> onClickLogin -> result", result)
-
-    } catch (error) {
-      console.log(error);
-    }
+    login(username, password);
   }
 
   render = () => {
@@ -200,3 +181,13 @@ export default class Login extends React.Component {
     );
   }
 }
+
+const mapStateToProps = state => ({
+
+});
+
+const mapDispatchToProps = dispatch => ({
+  login: (username, password) => dispatch({ type: ActionTypes.AUTH_LOGIN, username, password }),
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(Login);
