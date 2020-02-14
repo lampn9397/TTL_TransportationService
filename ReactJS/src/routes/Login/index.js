@@ -10,7 +10,7 @@ import ActionTypes from '../../redux/AuthModule/action';
 class Login extends React.Component {
   state = {
     username: 'thuan',
-    password: '12345',
+    password: '123123',
   }
 
   onChange = fieldName => e => {

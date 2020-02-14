@@ -1,4 +1,5 @@
 import { put, takeLeading } from 'redux-saga/effects';
+import CryptoJS from 'crypto-js';
 
 // Variables
 import ActionTypes from './action';
@@ -10,8 +11,9 @@ function* AUTH_LOGIN(action) {
   try {
     const body = {
       username: action.username,
-      password: action.password,
+      password: CryptoJS.MD5(action.password).toString(),
     };
+    console.log("TCL: function*AUTH_LOGIN -> body", body)
 
     const response = yield userAxios.post('/login', body);
 
