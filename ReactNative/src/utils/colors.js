@@ -13,4 +13,6 @@ export default {
   DARK_BLUE: '#0E4380',
   DARK_RED: '#E80000',
   PRIMARY_BORDER: '#ecf0f1',
+  ORANGE: '#F6901E',
+  FUTABUS_PRIMARY: '#ef5222',
 };

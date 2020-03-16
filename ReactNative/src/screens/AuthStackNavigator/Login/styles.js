@@ -9,17 +9,18 @@ const common = StyleSheet.create({
     flex: 1,
     padding: 12,
     justifyContent: 'center',
-    backgroundColor: '#F6901E',
+    backgroundColor: Colors.ORANGE,
   },
 });
 
 const logo = StyleSheet.create({
   image: {
-    width: 311,
+    width: '100%',
     height: 93,
     marginBottom: 10,
     borderRadius: 12,
     alignSelf: 'center',
+    resizeMode: 'contain',
   },
 });
 

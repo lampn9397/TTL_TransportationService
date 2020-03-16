@@ -36,20 +36,5 @@ target 'transportationservice' do
 
   pod 'RNVectorIcons', :path => '../node_modules/react-native-vector-icons'
 
-  target 'transportationserviceTests' do
-    inherit! :search_paths
-    # Pods for testing
-  end
-
   use_native_modules!
-end
-
-target 'transportationservice-tvOS' do
-  # Pods for transportationservice-tvOS
-
-  target 'transportationservice-tvOSTests' do
-    inherit! :search_paths
-    # Pods for testing
-  end
-
 end
