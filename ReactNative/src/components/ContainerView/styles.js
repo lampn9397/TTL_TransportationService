@@ -1,26 +1,19 @@
-import { StyleSheet } from 'react-native';
+import { StyleSheet, Platform, Dimensions } from 'react-native';
+
+const { width: WIDTH, height: HEIGHT } = Dimensions.get('window');
 
 const common = StyleSheet.create({
   container: { flex: 1 },
   loadingContainer: {
+    // backgroundColor: 'white',
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  amesPosition: {
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    // zIndex: -1,
-    position: 'absolute',
-    height: 160 / 2 + 10,
-    // backgroundColor: Colors.PRIMARY
-  },
+    // alignItems: 'center',
+    // justifyContent: 'center'
+  }
 });
 
 const styles = {
-  common,
+  common
 };
 
 export default styles;

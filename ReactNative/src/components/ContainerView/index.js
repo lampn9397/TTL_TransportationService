@@ -1,72 +1,56 @@
-/* eslint-disable react/jsx-props-no-spreading */
 import React from 'react';
 import PropTypes from 'prop-types';
 import {
   View,
-  Text,
   Platform,
   SafeAreaView,
   ActivityIndicator,
 } from 'react-native';
 
-// Stylesheet
-import styles from './styles';
+const ContainerView = (props) => {
+  const { ready, style, children } = props;
 
-export default class ContainerView extends React.PureComponent {
-  render = () => {
-    const {
-      ready,
-      children,
-      loadingText,
-      loadingProps,
-      hasLoaderCard,
-      style: styleProps,
-    } = this.props;
-    const style = { container: [styles.common.container], subContainer: [styleProps] };
-    if (styleProps instanceof Array) {
-      // style.container = styleProps;
-      style.subContainer = styleProps;
-    }
-    if (!ready) {
-      // displayStyle = { display: "none" };
-      style.subContainer.push({ display: 'none' });
-      style.container.push(styles.common.loadingContainer);
-      style.container.push(styleProps);
-    }
-    const { loaderCardBackgroundColor: backgroundColor } = this.props;
-    return (
-      <SafeAreaView style={style.container}>
-        {!ready && (
-          <View>
-            <ActivityIndicator size={Platform.OS === 'ios' ? 'small' : 20} {...loadingProps} />
-            {typeof loadingText === 'string' && <Text>{loadingText}</Text>}
-          </View>
-        )}
-        <View style={style.subContainer}>
-          {hasLoaderCard && <View style={[styles.common.amesPosition, { backgroundColor }]} />}
-          {children}
-        </View>
-      </SafeAreaView>
-    );
+  const combinedStyle = {
+    container: [],
+    subContainer: [],
   };
-}
 
-ContainerView.propTypes = {
-  ready: PropTypes.bool,
-  loadingText: PropTypes.string,
-  hasLoaderCard: PropTypes.bool,
-  children: PropTypes.instanceOf(Object),
-  loadingProps: PropTypes.instanceOf(Object),
-  loaderCardBackgroundColor: PropTypes.string,
-  style: PropTypes.oneOfType([PropTypes.object, PropTypes.array]),
+  if (style instanceof Array) {
+    combinedStyle.container = combinedStyle.container.concat(style);
+    combinedStyle.subContainer = combinedStyle.subContainer.concat(style);
+  } else {
+    combinedStyle.container.push(style);
+    combinedStyle.subContainer.push(style);
+  }
+
+  if (!ready) {
+    combinedStyle.subContainer.push({ display: 'none' });
+  }
+
+  return (
+    <SafeAreaView style={combinedStyle.container}>
+      {!ready && <ActivityIndicator size={Platform.select({ ios: 'small', android: 20 })} />}
+      <View style={combinedStyle.subContainer}>
+        {children}
+      </View>
+    </SafeAreaView>
+  );
 };
 
 ContainerView.defaultProps = {
-  ready: true,
+  style: {},
+  ready: false,
   children: null,
-  loadingText: '',
-  loadingProps: {},
-  hasLoaderCard: false,
-  style: styles.common.container,
-  loaderCardBackgroundColor: undefined,
 };
+
+ContainerView.propTypes = {
+  ready: PropTypes.bool,
+  children: PropTypes.node,
+  style: PropTypes.oneOfType([
+    PropTypes.number,
+    PropTypes.instanceOf(Array),
+    PropTypes.instanceOf(Object),
+  ]),
+};
+
+export default ContainerView;
