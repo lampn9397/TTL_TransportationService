@@ -1,0 +1,59 @@
+
+
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+<title>AdminCP</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<script type="text/javascript"
+	th:src="@{/admin_cp/demo/data/js/jquery-1.7.1.min.js}"></script>
+<script type="text/javascript"
+	th:src="@{/admin_cp/demo/data/js/jquery.corner.js}"></script>
+<script type="text/javascript"
+	th:src="@{/admin_cp/demo/data/js/jquery.validate.js}"></script>
+<script type="text/javascript"
+	th:src="@{/admin_cp/demo/data/js/css_browser_selector.js}"></script>
+<script type="text/javascript" th:src="@{/admin_cp/demo/data/js/js.js}"></script>
+<link rel="stylesheet" th:href="@{/admin_cp/demo/data/css/reset.css}"
+	type="text/css" />
+<link rel="stylesheet" th:href="@{/admin_cp/demo/data/css/grid.css}"
+	type="text/css" />
+<link rel="stylesheet" th:href="@{/admin_cp/demo/data/css/style.css}"
+	type="text/css" />
+</head>
+<body>
+	<!-- /login?error=true -->
+
+
+	<div id="loginbox">
+		<a href="#" id="logo">AdminCP</a>
+		<div id="loginform">
+			<form name='f' th:action="@{/login}" method='POST'>
+				<div id="username_field">
+					<input type="text" name="username" placeholder="Username"
+						class="required" value="" />
+				</div>
+				<div id="password_field">
+					<input type="password" name="password" placeholder="Password"
+						class="required" value="" />
+				</div>
+				<div id="buttonline">
+					<input type="submit" name="submit" id="loginbutton"
+						class="float_left width_4" value="Login" /> <a href="#"
+						class="passforgot float_right">Forgot your password?</a>
+				</div>
+			</form>
+			<div th:if="${#request.getParameter('error') == 'true'}"
+				style="color: red; margin: 10px 0px;">
+				Username or password is incorrect !<br />
+				<!-- Reason :
+         <span th:if="${#session!= null and #session.getAttribute('SPRING_SECURITY_LAST_EXCEPTION') != null}"
+            th:utext="${#session.getAttribute('SPRING_SECURITY_LAST_EXCEPTION').message}">
+                Static summary
+         </span>
+             -->
+			</div>
+		</div>
+	</div>
+</body>
+</html>

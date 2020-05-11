@@ -25,7 +25,7 @@ export default class Login extends React.Component {
 
       const body = JSON.stringify({ username, password });
 
-      const response = await fetch('https://8cfd98a1.ngrok.io/api/users/login', {
+      const response = await fetch('http://localhost/api/users/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body,
