@@ -1,15 +1,16 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
 import React from 'react';
-import axios from 'axios';
+import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 
 // Variables
 import './styles';
+import ActionTypes from '../../redux/AuthModule/action';
 
-export default class Login extends React.Component {
+class Login extends React.Component {
   state = {
     username: 'thuan',
-    password: '12345',
+    password: '123123',
   }
 
   onChange = fieldName => e => {
@@ -19,10 +20,9 @@ export default class Login extends React.Component {
   }
 
   onClickLogin = async (e) => {
-    try {
-      const { username, password } = this.state;
-      console.log("TCL: Login -> onClickLogin -> username, password", username, password)
+    const { login } = this.props;
 
+<<<<<<< HEAD
       const body = JSON.stringify({ username, password });
 
       const response = await fetch('http://localhost/api/users/login', {
@@ -40,10 +40,11 @@ export default class Login extends React.Component {
 
       // const result = await response.text();
       // console.log("TCL: Login -> onClickLogin -> result", result)
+=======
+    const { username, password } = this.state;
+>>>>>>> d7b8b1e984fa5d8c284b33a9d0a1ca721b2d9a43
 
-    } catch (error) {
-      console.log(error);
-    }
+    login(username, password);
   }
 
   render = () => {
@@ -200,3 +201,13 @@ export default class Login extends React.Component {
     );
   }
 }
+
+const mapStateToProps = state => ({
+
+});
+
+const mapDispatchToProps = dispatch => ({
+  login: (username, password) => dispatch({ type: ActionTypes.AUTH_LOGIN, username, password }),
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(Login);
