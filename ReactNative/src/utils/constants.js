@@ -1,3 +1,5 @@
+import Colors from './colors';
+
 export const apiResponse = {
   status: {
     SUCCESS: 'SUCCESS',
@@ -7,4 +9,11 @@ export const apiResponse = {
 
 export const asyncStorageKey = {
   USER: 'USER',
+};
+
+export const navigatorScreenOptions = {
+  headerTintColor: 'white',
+  headerStyle: {
+    backgroundColor: Colors.FUTABUS_PRIMARY,
+  },
 };

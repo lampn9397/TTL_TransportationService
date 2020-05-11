@@ -37,7 +37,7 @@ class MainScreen extends React.Component {
         navigation.navigate('ChangePasswordScreen');
         break;
       case 'Logout':
-        Alert.alert('REMS', 'Bạn muốn đăng xuất?', [
+        Alert.alert('Đăng xuất', 'Bạn muốn đăng xuất?', [
           { text: 'Không' },
           {
             text: 'Có',
@@ -54,19 +54,9 @@ class MainScreen extends React.Component {
   render = () => {
     const { loggedInUser } = this.props;
 
-    let firstRoleName = '';
+    let avatarSource = { uri: loggedInUser.user.avatarUrl };
 
-    let avatarSource = { uri: loggedInUser.avatarUrl };
-
-    if (loggedInUser.roles instanceof Array && loggedInUser.roles.length > 0) {
-      firstRoleName = loggedInUser.roles[0].name;
-    }
-
-    if (firstRoleName.length === 0) {
-      firstRoleName = 'Đối tác';
-    }
-
-    if (typeof loggedInUser.avatarUrl !== 'string' || loggedInUser.avatarUrl.length === 0) {
+    if (typeof avatarSource.uri !== 'string' || avatarSource.uri.length === 0) {
       avatarSource = avatarPlaceholder;
     }
 
@@ -83,21 +73,21 @@ class MainScreen extends React.Component {
                   <View style={[styles.shadow, styles.avatar.container]}>
                     <Image source={avatarSource} style={styles.avatar.image} />
                   </View>
-                  <Text allowFontScaling style={styles.avatar.text}>{loggedInUser.fullname}</Text>
+                  <Text allowFontScaling style={styles.avatar.text}>{loggedInUser.user.fullname}</Text>
                 </View>
               </View>
               <View style={styles.item.container}>
                 <MIcon name="email" size={26} color={Colors.LIGHT_BLACK} />
                 <View style={styles.item.textContainer}>
-                  <Text allowFontScaling style={styles.item.text}>{loggedInUser.email}</Text>
+                  <Text allowFontScaling style={styles.item.text}>{loggedInUser.user.email}</Text>
                 </View>
               </View>
-              {/* <View style={[styles.item.container, { borderBottomWidth: 0 }]}>
+              <View style={[styles.item.container, { borderBottomWidth: 0 }]}>
                 <MIcon name="briefcase" size={26} color={Colors.LIGHT_BLACK} />
                 <View style={styles.item.textContainer}>
-                  <Text allowFontScaling style={styles.item.text}>{firstRoleName}</Text>
+                  <Text allowFontScaling style={styles.item.text}>{loggedInUser.division?.name}</Text>
                 </View>
-              </View> */}
+              </View>
             </View>
             <View style={[styles.shadow, styles.itemContainer, { marginTop: 8 }]}>
               {/* <TouchableRipple style={styles.item.container} onPress={this.onPressItem('AddProduct')}>
@@ -112,7 +102,7 @@ class MainScreen extends React.Component {
                   <Text allowFontScaling style={styles.item.text}>Xem gần đây</Text>
                 </View>
               </TouchableRipple> */}
-              <TouchableRipple style={styles.item.container} onPress={this.onPressItem('UpdateProfile')}>
+              {/* <TouchableRipple style={styles.item.container} onPress={this.onPressItem('UpdateProfile')}>
                 <MIcon name="wrench" size={26} color={Colors.LIGHT_BLACK} />
                 <View style={styles.item.textContainer}>
                   <Text allowFontScaling style={styles.item.text}>Cập nhật thông tin</Text>
@@ -123,7 +113,7 @@ class MainScreen extends React.Component {
                 <View style={styles.item.textContainer}>
                   <Text allowFontScaling style={styles.item.text}>Đổi mật khẩu</Text>
                 </View>
-              </TouchableRipple>
+              </TouchableRipple> */}
               <TouchableRipple style={[styles.item.container, { borderBottomWidth: 0 }]} onPress={this.onPressItem('Logout')}>
                 <MIcon name="logout-variant" size={26} color={Colors.LIGHT_BLACK} />
                 <View style={styles.item.textContainer}>

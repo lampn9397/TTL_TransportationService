@@ -4,7 +4,7 @@ import { connect } from 'react-redux';
 
 // Components
 import AuthStackNavigator from './AuthStackNavigator';
-import TabNavigator from './TabNavigator';
+import AppStackNavigator from './AppStackNavigator';
 
 // Variables
 import ActionTypes from '../redux/AuthModule/action';
@@ -14,14 +14,14 @@ const AppNavigator = (props) => {
 
   React.useEffect(() => {
     checkAutoLogin();
-  }, []);
+  });
 
   if (ready === false) return null;
 
   return (
     <React.Fragment>
       {loggedInUser === null && <AuthStackNavigator />}
-      {loggedInUser !== null && <TabNavigator />}
+      {loggedInUser !== null && <AppStackNavigator />}
     </React.Fragment>
   );
 };

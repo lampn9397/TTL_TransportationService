@@ -5,6 +5,7 @@ import Touchable from 'react-native-material-ripple';
 const TouchableRipple = (props) => {
   const { children } = props;
 
+  // eslint-disable-next-line react/jsx-props-no-spreading
   return <Touchable {...props}>{children}</Touchable>;
 };
 

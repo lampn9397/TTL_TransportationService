@@ -5,7 +5,7 @@ import AsyncStorage from '@react-native-community/async-storage';
 
 // Variables
 import ActionTypes from './action';
-import { userAxios } from '../../utils/axios';
+import apiAxios from '../../utils/axios';
 import { apiResponse, asyncStorageKey } from '../../utils/constants';
 
 // eslint-disable-next-line import/no-cycle
@@ -15,31 +15,36 @@ function* AUTH_LOGIN(action) {
   yield put({
     type: ActionTypes.AUTH_LOGIN_SUCCESS,
     loggedInUser: {
-      fullname: 'Phan Ngoc Lam',
-      email: 'lampn9397@gmail.com',
+      user: {
+        fullname: 'Phan Ngoc Lam',
+        email: 'lampn9397@gmail.com',
+      }
     },
   });
   return;
-  let alertMessage = 'Đăng nhập không thành công';
+  let alertMessage = 'Failed to login, please try again later.';
   try {
     const body = {
-      username: action.username,
-      password: CryptoJS.MD5(action.password).toString(),
+      username: action.data.username,
+      password: CryptoJS.MD5(action.data.password).toString(),
     };
-    console.log("TCL: function*AUTH_LOGIN -> body", body)
 
-    const response = yield userAxios.post('/login', body);
+    const response = yield apiAxios.post('users/login', body);
+    // console.log("function*AUTH_LOGIN -> response", response.data)
 
     alertMessage = response.data.message;
 
     if (response.data.status === apiResponse.status.SUCCESS) {
-
+      yield put({
+        type: ActionTypes.AUTH_LOGIN_SUCCESS,
+        loggedInUser: response.data.data,
+      });
+      return;
     }
-
   } catch (error) {
     console.log(error);
   }
-  alert(alertMessage);
+  Alert.alert('Login', alertMessage);
 
   yield put({ type: ActionTypes.AUTH_LOGIN_SUCCESS });
 }
@@ -69,7 +74,7 @@ function* AUTH_UPDATE_PROFILE(payload) {
 
   const { data } = payload;
   let isValid = true;
-  const alertModel = { title: 'REMS', message: 'Cập nhật thông tin thành công.' };
+  const alertModel = { title: 'Cập nhật thông tin', message: 'Cập nhật thông tin thành công.' };
   // p_API_REMS_Users_ChangeInfo_V1
 
   if (data.fullname.length === 0) {
@@ -86,15 +91,10 @@ function* AUTH_UPDATE_PROFILE(payload) {
   const { loggedInUser } = store.getState().authReducer.loginReducer;
 
   try {
-    const response = yield dynamicAxios.execute().post('', {
-      sqlCommand: 'p_API_REMS_Users_ChangeInfo',
-      parameters: {
-        UserId: loggedInUser.id,
-        NewFullName: data.fullname,
-      },
+    const response = yield apiAxios.post('/users/get', {
+      username: '',
+      password: '',
     });
-    // console.log("TCL: function*AUTH_UPDATE_PROFILE -> response", response)
-
     if (response.data.ok) {
       alertModel.message = 'Cập nhật thông tin thành công';
       alertModel.buttons = [{
