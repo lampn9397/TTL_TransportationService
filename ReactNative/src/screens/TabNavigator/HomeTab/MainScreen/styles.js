@@ -4,10 +4,12 @@ import Colors from '../../../../utils/colors';
 const common = StyleSheet.create({
   container: { flex: 1 },
   scrollView: {
-    backgroundColor: Colors.LIGHT_GRAY,
+    backgroundColor: '#eff2f4',
   },
   scrollViewContent: {
     padding: 10,
+    flexGrow: 1,
+    // justifyContent: 'center',
   },
   shadow: {
     elevation: 5,
@@ -88,9 +90,28 @@ const search = StyleSheet.create({
   },
 });
 
+const FAQ = StyleSheet.create({
+  buttonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+  },
+  touchable: {
+    width: 45,
+    height: 45,
+    marginHorizontal: 5,
+    alignSelf: 'center',
+    alignItems: 'center',
+    borderRadius: 45 / 2,
+    justifyContent: 'center',
+    borderWidth: 2,
+    borderColor: Colors.FUTABUS_PRIMARY,
+  },
+});
+
 export default {
   ...common,
   item,
   picker,
   search,
+  FAQ,
 };

@@ -5,24 +5,22 @@ import { createStackNavigator } from '@react-navigation/stack';
 import MainScreen from './MainScreen';
 import UpdateProfileScreen from './UpdateProfileScreen';
 import ChangePasswordScreen from './ChangePasswordScreen';
+import { navigatorScreenOptions } from '../../../utils/constants';
 
 const Stack = createStackNavigator();
 
 const screenOptions = {
-  navigator: {
-    cardStyle: {
-      backgroundColor: 'white',
-    },
-  },
   MainScreen: {
     headerShown: false,
   },
-  UpdateProfileScreen: {},
+  UpdateProfileScreen: {
+    title: 'Update profile',
+  },
   ChangePasswordScreen: {},
 };
 
 const AccountTab = () => (
-  <Stack.Navigator screenOptions={screenOptions.navigator}>
+  <Stack.Navigator screenOptions={navigatorScreenOptions}>
     <Stack.Screen
       name="MainScreen"
       component={MainScreen}

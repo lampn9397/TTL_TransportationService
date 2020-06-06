@@ -1,12 +1,14 @@
 import React from 'react';
+import MIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 
 // Components
 import HomeTab from './HomeTab';
 import AccountTab from './AccountTab';
-import Colors from '../../utils/colors';
 
 // Variables
+import Colors from '../../utils/colors';
+
 const Tab = createMaterialTopTabNavigator();
 
 const tabBarOptions = {
@@ -17,15 +19,27 @@ const tabBarOptions = {
     shadowColor: 'black',
     shadowOffset: { width: 0, height: 3 },
   },
+  tabStyle: {
+    paddingVertical: 5,
+  },
   indicatorStyle: {
     top: 0,
     backgroundColor: Colors.BLACK,
   },
+  labelStyle: { textTransform: 'none' },
+  showIcon: true,
+  activeTintColor: Colors.FUTABUS_PRIMARY,
 };
 
 const screenOptions = {
-  HomeTab: { title: 'Home' },
-  AccountTab: { title: 'Tài khoản' },
+  HomeTab: {
+    title: 'Home',
+    tabBarIcon: ({ color }) => <MIcon name="home" color={color} size={24} />,
+  },
+  AccountTab: {
+    title: 'Account',
+    tabBarIcon: ({ color }) => <MIcon name="account-circle" color={color} size={24} />,
+  },
 };
 
 const TabNavigator = () => (

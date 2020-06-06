@@ -24,29 +24,18 @@ class MainScreen extends React.Component {
   onPressItem = (itemName) => () => {
     const { navigation, logout } = this.props;
     switch (itemName) {
-      case 'AddProduct':
-        navigation.navigate('AddProductScreen');
-        break;
-      case 'RecentView':
-        navigation.navigate('RecentViewScreen');
-        break;
-      case 'UpdateProfile':
-        navigation.navigate('UpdateProfileScreen');
-        break;
-      case 'ChangePassword':
-        navigation.navigate('ChangePasswordScreen');
-        break;
       case 'Logout':
-        Alert.alert('Đăng xuất', 'Bạn muốn đăng xuất?', [
-          { text: 'Không' },
+        Alert.alert('Transportation Service', 'You want to logout?', [
+          { text: 'No' },
           {
-            text: 'Có',
+            text: 'Yes',
             onPress: logout,
           },
         ]);
         break;
 
       default:
+        navigation.navigate(itemName);
         break;
     }
   };
@@ -76,48 +65,48 @@ class MainScreen extends React.Component {
                   <Text allowFontScaling style={styles.avatar.text}>{loggedInUser.user.fullname}</Text>
                 </View>
               </View>
-              <View style={styles.item.container}>
-                <MIcon name="email" size={26} color={Colors.LIGHT_BLACK} />
+              <View style={[styles.item.container, { borderBottomWidth: 0 }]}>
+                <MIcon name="phone" size={26} color={Colors.FUTABUS_PRIMARY} />
                 <View style={styles.item.textContainer}>
-                  <Text allowFontScaling style={styles.item.text}>{loggedInUser.user.email}</Text>
+                  <Text allowFontScaling style={styles.item.text}>{loggedInUser.user.phonenumber}</Text>
                 </View>
               </View>
-              <View style={[styles.item.container, { borderBottomWidth: 0 }]}>
-                <MIcon name="briefcase" size={26} color={Colors.LIGHT_BLACK} />
+              <View style={styles.item.container}>
+                <MIcon name="email" size={26} color={Colors.FUTABUS_PRIMARY} />
                 <View style={styles.item.textContainer}>
-                  <Text allowFontScaling style={styles.item.text}>{loggedInUser.division?.name}</Text>
+                  <Text allowFontScaling style={styles.item.text}>{loggedInUser.user.email}</Text>
                 </View>
               </View>
             </View>
             <View style={[styles.shadow, styles.itemContainer, { marginTop: 8 }]}>
               {/* <TouchableRipple style={styles.item.container} onPress={this.onPressItem('AddProduct')}>
-                <MIcon name="plus-circle" size={26} color={Colors.LIGHT_BLACK} />
+                <MIcon name="plus-circle" size={26} color={Colors.FUTABUS_PRIMARY} />
                 <View style={styles.item.textContainer}>
                   <Text allowFontScaling style={styles.item.text}>Thêm bài đăng</Text>
                 </View>
               </TouchableRipple> */}
-              {/* <TouchableRipple style={styles.item.container} onPress={this.onPressItem('RecentView')}>
-                <MIcon name="history" size={26} color={Colors.LIGHT_BLACK} />
+              <TouchableRipple style={styles.item.container} onPress={this.onPressItem('TicketHistoryScreen')}>
+                <MIcon name="ticket" size={26} color={Colors.FUTABUS_PRIMARY} />
                 <View style={styles.item.textContainer}>
-                  <Text allowFontScaling style={styles.item.text}>Xem gần đây</Text>
-                </View>
-              </TouchableRipple> */}
-              {/* <TouchableRipple style={styles.item.container} onPress={this.onPressItem('UpdateProfile')}>
-                <MIcon name="wrench" size={26} color={Colors.LIGHT_BLACK} />
-                <View style={styles.item.textContainer}>
-                  <Text allowFontScaling style={styles.item.text}>Cập nhật thông tin</Text>
+                  <Text allowFontScaling style={styles.item.text}>Booked tickets</Text>
                 </View>
               </TouchableRipple>
-              <TouchableRipple style={styles.item.container} onPress={this.onPressItem('ChangePassword')}>
-                <MIcon name="lock" size={26} color={Colors.LIGHT_BLACK} />
+              <TouchableRipple style={styles.item.container} onPress={this.onPressItem('ChangePasswordScreen')}>
+                <MIcon name="lock" size={26} color={Colors.FUTABUS_PRIMARY} />
                 <View style={styles.item.textContainer}>
-                  <Text allowFontScaling style={styles.item.text}>Đổi mật khẩu</Text>
+                  <Text allowFontScaling style={styles.item.text}>Change password</Text>
                 </View>
-              </TouchableRipple> */}
-              <TouchableRipple style={[styles.item.container, { borderBottomWidth: 0 }]} onPress={this.onPressItem('Logout')}>
-                <MIcon name="logout-variant" size={26} color={Colors.LIGHT_BLACK} />
+              </TouchableRipple>
+              <TouchableRipple style={styles.item.container} onPress={this.onPressItem('UpdateProfileScreen')}>
+                <MIcon name="wrench" size={26} color={Colors.FUTABUS_PRIMARY} />
                 <View style={styles.item.textContainer}>
-                  <Text allowFontScaling style={styles.item.text}>Đăng xuất</Text>
+                  <Text allowFontScaling style={styles.item.text}>Update profile</Text>
+                </View>
+              </TouchableRipple>
+              <TouchableRipple style={[styles.item.container, { borderBottomWidth: 0 }]} onPress={this.onPressItem('Logout')}>
+                <MIcon name="logout-variant" size={26} color={Colors.FUTABUS_PRIMARY} />
+                <View style={styles.item.textContainer}>
+                  <Text allowFontScaling style={styles.item.text}>Logout</Text>
                 </View>
               </TouchableRipple>
             </View>

@@ -3,6 +3,7 @@ import createSagaMiddleware from 'redux-saga';
 
 import rootSagas from './rootSaga';
 import authReducer from './AuthModule/reducer';
+import orderReducer from './OrderModule/reducer';
 
 // import { composeWithDevTools } from 'redux-devtools-extension';
 
@@ -15,7 +16,8 @@ const middlewares = [
 
 // Reducer
 const rootReducer = combineReducers({
-  authReducer
+  authReducer,
+  orderReducer,
 });
 
 const store = createStore(

@@ -3,7 +3,8 @@ import Colors from '../../../../utils/colors';
 
 const common = StyleSheet.create({
   container: { flex: 1 },
-  wrapper: {
+  scrollViewContent: {
+    flexGrow: 1,
     paddingHorizontal: 10,
     justifyContent: 'center',
   },
@@ -41,10 +42,10 @@ const input = StyleSheet.create({
     marginBottom: 3,
   },
   inputContainer: {
-    borderWidth: 1,
+    borderWidth: 2,
     borderRadius: 5,
     paddingHorizontal: 15,
-    borderColor: Colors.DARK_GRAY,
+    borderColor: Colors.FUTABUS_PRIMARY,
   },
   textInput: {
     paddingVertical: Platform.OS === 'ios' ? 10 : undefined,
@@ -55,7 +56,7 @@ const submit = StyleSheet.create({
   touchable: {
     padding: 12,
     borderRadius: 5,
-    backgroundColor: Colors.PRIMARY,
+    backgroundColor: Colors.FUTABUS_PRIMARY,
   },
   text: {
     color: 'white',

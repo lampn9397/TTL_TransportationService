@@ -1,4 +1,4 @@
-import { StyleSheet } from 'react-native';
+import { StyleSheet, Dimensions } from 'react-native';
 import Colors from '../../../utils/colors';
 
 const common = StyleSheet.create({
@@ -62,6 +62,8 @@ const submit = StyleSheet.create({
   },
 });
 
+const { width } = Dimensions.get('window');
+
 const seat = StyleSheet.create({
   flatlist: {
     transform: [{ scaleX: -1 }],
@@ -70,8 +72,9 @@ const seat = StyleSheet.create({
     paddingVertical: 10,
   },
   touchable: {
-    transform: [{ scaleX: -1 }],
+    width: width / 2,
     alignItems: 'center',
+    transform: [{ scaleX: -1 }],
   },
   seatText: {
     fontSize: 16,

@@ -21,6 +21,7 @@ export default (state = defaultState, action) => {
     case ActionTypes.AUTH_LOGIN_SUCCESS: {
       return {
         ...state,
+        ready: true,
         loading: false,
         loggedInUser: action.loggedInUser,
         error: null,
@@ -30,9 +31,81 @@ export default (state = defaultState, action) => {
     case ActionTypes.AUTH_LOGIN_ERROR: {
       return {
         ...state,
+        ready: true,
         loading: false,
         loggedInUser: null,
         error: action.error,
+      };
+    }
+
+    case ActionTypes.AUTH_REGISTER: {
+      return {
+        ...state,
+        loading: true,
+        loggedInUser: null,
+        error: null,
+      };
+    }
+
+    case ActionTypes.AUTH_REGISTER_SUCCESS: {
+      return {
+        ...state,
+        loading: false,
+        loggedInUser: action.loggedInUser,
+        error: null,
+      };
+    }
+
+    case ActionTypes.AUTH_REGISTER_ERROR: {
+      return {
+        ...state,
+        loading: false,
+        loggedInUser: null,
+        error: action.error,
+      };
+    }
+
+    case ActionTypes.AUTH_REGISTER_VERIFY_CODE: {
+      return {
+        ...state,
+        loading: true,
+      };
+    }
+
+    case ActionTypes.AUTH_REGISTER_VERIFY_CODE_SUCCESS: {
+      return {
+        ...state,
+        loading: false,
+        loggedInUser: action.loggedInUser,
+      };
+    }
+
+    case ActionTypes.AUTH_REGISTER_VERIFY_CODE_ERROR: {
+      return {
+        ...state,
+        loading: false,
+      };
+    }
+
+    case ActionTypes.AUTH_UPDATE_PROFILE: {
+      return {
+        ...state,
+        loading: true,
+      };
+    }
+
+    case ActionTypes.AUTH_UPDATE_PROFILE_SUCCESS: {
+      return {
+        ...state,
+        loading: false,
+        loggedInUser: action.loggedInUser,
+      };
+    }
+
+    case ActionTypes.AUTH_UPDATE_PROFILE_FAIL: {
+      return {
+        ...state,
+        loading: false,
       };
     }
 
@@ -66,12 +139,14 @@ export default (state = defaultState, action) => {
     case ActionTypes.AUTH_UPDATE_PASSWORD: {
       return {
         ...state,
+        loading: true,
       };
     }
 
     case ActionTypes.AUTH_UPDATE_PASSWORD_FAIL: {
       return {
         ...state,
+        loading: false,
       };
     }
 
@@ -79,10 +154,7 @@ export default (state = defaultState, action) => {
       // console.log(action);
       return {
         ...state,
-        loggedInUser: {
-          ...state.loggedInUser,
-          password: action.password,
-        },
+        loading: false,
       };
     }
     default:

@@ -37,8 +37,8 @@ class LoginScreen extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      username: __DEV__ ? 'lampn' : '',
-      password: __DEV__ ? '123123' : '',
+      username: __DEV__ ? 'lampn9397' : '',
+      password: __DEV__ ? 'Caothuvolam2' : '',
       storeId: __DEV__ ? 'lampn@ames.edu.vn' : '',
       secureTextEntry: true,
     };
@@ -110,9 +110,14 @@ class LoginScreen extends React.Component {
     const { username, password, storeId } = this.state;
 
     const data = { username, password, storeId };
-
     // eslint-disable-next-line react/destructuring-assignment
     this.props.login(data);
+  }
+
+  register = () => {
+    const { navigation } = this.props;
+
+    navigation.replace('Register');
   }
 
   render = () => {
@@ -227,6 +232,16 @@ class LoginScreen extends React.Component {
                   {loading === false && <Text style={styles.submit.text}>Log in</Text>}
                   {loading && <ActivityIndicator size={Platform.OS === 'ios' ? 'small' : 20} color="white" />}
                 </TouchableRipple>
+                <TouchableRipple
+                  rippleColor="white"
+                  rippleOpacity={0.1}
+                  disabled={loading}
+                  style={[styles.submit.touchable, { marginTop: 10 }]}
+                  onPress={this.register}
+                >
+                  {loading === false && <Text style={styles.submit.text}>Register</Text>}
+                  {loading && <ActivityIndicator size={Platform.OS === 'ios' ? 'small' : 20} color="white" />}
+                </TouchableRipple>
               </KeyboardAvoidingView>
             </ScrollView>
           </ContainerView>
@@ -239,6 +254,7 @@ class LoginScreen extends React.Component {
 LoginScreen.propTypes = {
   login: PropTypes.func.isRequired,
   loading: PropTypes.bool.isRequired,
+  navigation: PropTypes.instanceOf(Object).isRequired,
 };
 
 const mapStateToProps = (state) => ({

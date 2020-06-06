@@ -12,14 +12,15 @@ import {
   TouchableOpacity,
   KeyboardAvoidingView,
 } from 'react-native';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 
 // Components
 import TouchableRipple from '../../../../components/TouchableRipple';
 
 // Variables
 import styles from './styles';
-import avatarPlaceholder from '../../../../assets/images/user.png';
 import ActionTypes from '../../../../redux/AuthModule/action';
+import avatarPlaceholder from '../../../../assets/images/user.png';
 
 class ChangePasswordScreen extends React.Component {
   newPassword = React.createRef();
@@ -69,15 +70,15 @@ class ChangePasswordScreen extends React.Component {
         style={styles.container}
         onPress={Keyboard.dismiss}
       >
-        <KeyboardAvoidingView
-          behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-          style={[styles.container, styles.wrapper]}
+        <KeyboardAwareScrollView
+          // behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+          contentContainerStyle={styles.scrollViewContent}
         >
           <View style={[styles.shadow, styles.avatar.container]}>
             <Image source={avatarSource} style={styles.avatar.image} />
           </View>
           <View style={styles.input.container}>
-            <Text allowFontScaling style={styles.input.inputNameText}>Mật khẩu hiện tại:</Text>
+            <Text allowFontScaling style={styles.input.inputNameText}>Current password:</Text>
             <View style={styles.input.inputContainer}>
               <TextInput
                 value={oldPassword}
@@ -89,7 +90,7 @@ class ChangePasswordScreen extends React.Component {
             </View>
           </View>
           <View style={styles.input.container}>
-            <Text allowFontScaling style={styles.input.inputNameText}>Mật khẩu mới:</Text>
+            <Text allowFontScaling style={styles.input.inputNameText}>New password:</Text>
             <View style={styles.input.inputContainer}>
               <TextInput
                 ref={this.newPassword}
@@ -102,7 +103,7 @@ class ChangePasswordScreen extends React.Component {
             </View>
           </View>
           <View style={styles.input.container}>
-            <Text allowFontScaling style={styles.input.inputNameText}>Nhập lại mật khẩu:</Text>
+            <Text allowFontScaling style={styles.input.inputNameText}>Repeat new password:</Text>
             <View style={styles.input.inputContainer}>
               <TextInput
                 ref={this.reNewPassword}
@@ -124,7 +125,7 @@ class ChangePasswordScreen extends React.Component {
               <Text allowFontScaling style={styles.submit.text}>Xác nhận</Text>
             </TouchableRipple>
           </View>
-        </KeyboardAvoidingView>
+        </KeyboardAwareScrollView>
       </TouchableOpacity>
     );
   };
@@ -135,12 +136,9 @@ ChangePasswordScreen.propTypes = {
   loggedInUser: PropTypes.instanceOf(Object).isRequired,
 };
 
-const mapStateToProps = (state) => {
-  const { loggedInUser } = state.authReducer;
-  return {
-    loggedInUser,
-  };
-};
+const mapStateToProps = (state) => ({
+  loggedInUser: state.authReducer.loggedInUser,
+});
 
 const mapDispatchToProps = (dispatch) => ({
   changePassword: (data) => dispatch({ type: ActionTypes.AUTH_UPDATE_PASSWORD, data }),

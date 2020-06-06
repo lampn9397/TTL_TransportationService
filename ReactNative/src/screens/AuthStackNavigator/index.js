@@ -11,12 +11,15 @@ const screenOptions = {
   Login: {
     headerShown: false,
   },
+  Register: {
+    headerShown: false,
+  },
 };
 
 const AuthStackNavigator = () => (
   <Stack.Navigator>
     <Stack.Screen name="Login" component={LoginScreen} options={screenOptions.Login} />
-    <Stack.Screen name="Register" component={Register} />
+    <Stack.Screen name="Register" component={Register} options={screenOptions.Register} />
   </Stack.Navigator>
 );
 

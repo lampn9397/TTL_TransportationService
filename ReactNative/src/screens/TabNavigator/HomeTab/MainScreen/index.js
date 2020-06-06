@@ -1,11 +1,12 @@
 import React from 'react';
+import moment from 'moment';
 import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
 import {
   View,
   Text,
-  FlatList,
+  Alert,
   ScrollView,
-  // RefreshControl,
   ActivityIndicator,
 } from 'react-native';
 import DatePicker from 'react-native-datepicker';
@@ -19,8 +20,9 @@ import TouchableRipple from '../../../../components/TouchableRipple';
 // Variables
 import styles from './styles';
 import Colors from '../../../../utils/colors';
-import apiAxios from '../../../../utils/axios';
 import { apiResponse } from '../../../../utils/constants';
+import apiAxios, { routeAxios } from '../../../../utils/axios';
+import ActionTypes from '../../../../redux/OrderModule/action';
 // import { apiResponse } from '../../../../utils/constants';
 
 const list = [];
@@ -29,8 +31,8 @@ for (let i = 0; i < 20; i++) {
   list.push(i);
 }
 
-export default class MainScreen extends React.Component {
-  toDay = new Date();
+class MainScreen extends React.Component {
+  toDay = moment();
 
   scrollViewRef = React.createRef();
 
@@ -60,10 +62,13 @@ export default class MainScreen extends React.Component {
       searchLoading: false,
       selectedDate: this.toDay,
       destinationRoutes: routes,
-      selectedRoute: routes[0].id,
+      selectedRoute: routes[0],
       destinationRoutesLoading: false,
-      selectedDestinationRoute: routes[0].id,
+      selectedDestinationRoute: routes[0],
     };
+
+    const { selectDate } = props;
+    selectDate(this.toDay);
   }
 
   componentDidMount = async () => {
@@ -73,16 +78,25 @@ export default class MainScreen extends React.Component {
     };
 
     try {
+      const { selectStartPoint, selectEndPoint } = this.props;
+
       const response = await apiAxios.get('/cities/get');
 
-      stateModel.routes = response.data;
+      if (response.data instanceof Array && response.data.length > 0) {
+        stateModel.routes = response.data;
 
-      stateModel.selectedRoute = stateModel.routes?.[0].id;
+        // eslint-disable-next-line prefer-destructuring
+        stateModel.selectedRoute = stateModel.routes[0];
 
-      stateModel.destinationRoutes = await this.searchDestinationRoutes(stateModel.selectedRoute);
+        selectStartPoint(stateModel.selectedRoute);
 
-      if (stateModel.destinationRoutes.length > 0) {
-        stateModel.selectedDestinationRoute = stateModel.destinationRoutes[0].id;
+        stateModel.destinationRoutes = await this.searchDestinationRoutes(stateModel.selectedRoute);
+
+        if (stateModel.destinationRoutes.length > 0) {
+          // eslint-disable-next-line prefer-destructuring
+          stateModel.selectedDestinationRoute = stateModel.destinationRoutes[0];
+          selectEndPoint(stateModel.selectedDestinationRoute);
+        }
       }
     } catch (error) {
       console.log(error);
@@ -91,15 +105,15 @@ export default class MainScreen extends React.Component {
     this.setState(stateModel);
   }
 
-  searchDestinationRoutes = async (startRouteId) => {
+  searchDestinationRoutes = async (endPoint) => {
     let destinationRoutes = [];
 
     try {
-      const response = await apiAxios.post('/routes/destinationRoutes', { id: startRouteId });
+      const response = await apiAxios.post('/routes/destinationRoutes', { id: endPoint.id });
 
       if (response.data.status === apiResponse.status.SUCCESS) {
         destinationRoutes = response.data.data.routes;
-        destinationRoutes = destinationRoutes.map((x) => ({ ...x, ...x.destination }));
+        destinationRoutes = destinationRoutes.map((x) => ({ ...x, routeId: x.id, ...x.destination }));
       }
     } catch (error) {
       console.log(error);
@@ -112,12 +126,32 @@ export default class MainScreen extends React.Component {
 
   onValueChange = (fieldName) => async (value) => {
     // eslint-disable-next-line react/destructuring-assignment
-    if (this.state[fieldName] === value) return;
+    if (this.state[fieldName]?.id === value) return;
 
-    const stateModel = { [fieldName]: value };
+    const { selectStartPoint, selectEndPoint } = this.props;
+
+    const stateModel = {};
 
     if (fieldName === 'selectedRoute') {
       stateModel.destinationRoutesLoading = true;
+
+      const { routes } = this.state;
+
+      const selectedRoute = routes.find((x) => x.id === value);
+
+      stateModel.selectedRoute = selectedRoute;
+
+      selectStartPoint(stateModel.selectedRoute);
+    }
+
+    if (fieldName === 'selectedDestinationRoute') {
+      const { destinationRoutes } = this.state;
+
+      const selectedDestinationRoute = destinationRoutes.find((x) => x.id === value);
+
+      stateModel.selectedDestinationRoute = selectedDestinationRoute;
+
+      selectEndPoint(stateModel.selectedDestinationRoute);
     }
 
     this.setState(stateModel);
@@ -127,12 +161,14 @@ export default class MainScreen extends React.Component {
     if (fieldName === 'selectedRoute') {
       stateModel.destinationRoutesLoading = false;
 
-      const destinationRoutes = await this.searchDestinationRoutes(value);
+      const destinationRoutes = await this.searchDestinationRoutes(stateModel.selectedRoute);
 
       stateModel.destinationRoutes = destinationRoutes;
 
       if (stateModel.destinationRoutes.length > 0) {
-        stateModel.selectedDestinationRoute = stateModel.destinationRoutes[0].id;
+        // eslint-disable-next-line prefer-destructuring
+        stateModel.selectedDestinationRoute = stateModel.destinationRoutes[0];
+        selectEndPoint(stateModel.selectedDestinationRoute);
       }
 
       this.setState(stateModel);
@@ -144,19 +180,53 @@ export default class MainScreen extends React.Component {
   }
 
   onDateChange = (date) => {
-    this.setState({ selectedDate: date });
+    const { selectDate } = this.props;
+
+    const selectedDate = moment(date, 'DD-MM-YYYY');
+
+    this.setState({ selectedDate });
+
+    selectDate(selectedDate);
   }
 
   onSearch = async () => {
     await new Promise((resolve) => this.setState({ searchLoading: true }, resolve));
 
-    await new Promise((resolve) => setTimeout(resolve, 3000));
+    const alertModel = { title: 'Ticket booking', message: 'Fail to confirm the book the ticket' };
+
+    const {
+      selectedDate,
+      selectedRoute,
+      selectedDestinationRoute,
+    } = this.state;
+
+    try {
+      const date = selectedDate.format('DD/MM/YYYY');
+
+      const response = await routeAxios.post('/searchRoute', {
+        date,
+        startId: selectedRoute.id,
+        endId: selectedDestinationRoute.id,
+      });
+
+      alertModel.message = response.data.message;
+
+      if (response.data.status === apiResponse.status.SUCCESS) {
+        const { navigation } = this.props;
+        navigation.navigate('BookTicket');
+        return;
+      }
+    } catch (error) {
+      console.log('onSearch', error);
+    }
 
     this.setState({ searchLoading: false });
 
-    await new Promise((resolve) => setTimeout(resolve, 500));
+    Alert.alert(alertModel.title, alertModel.message);
 
-    this.scrollViewRef.current.scrollToEnd();
+    // await new Promise((resolve) => setTimeout(resolve, 500));
+
+    // this.scrollViewRef.current.scrollToEnd();
   }
 
   renderSearchItem = ({ item, index }) => {
@@ -189,15 +259,18 @@ export default class MainScreen extends React.Component {
     navigation.navigate('BookTicket', { item });
   }
 
+  onPressFAQ = () => {
+    const { navigation } = this.props;
+
+    navigation.navigate('FAQScreen');
+  }
+
   render = () => {
     const {
       ready,
       routes,
-      // refreshing,
       selectedDate,
-      searchLoading,
       selectedRoute,
-      searchResults,
       destinationRoutes,
       destinationRoutesLoading,
       selectedDestinationRoute,
@@ -206,10 +279,6 @@ export default class MainScreen extends React.Component {
     const routePickerVisible = routes.length > 0;
 
     const destinationRoutePickerVisible = destinationRoutes.length > 0 && destinationRoutesLoading === false;
-
-    const searchResultVisible = searchResults.length > 0;
-
-    // const refreshControl = <RefreshControl refreshing={refreshing} onRefresh={this.onRefresh} />;
 
     const datepickerCustomStyles = {
       dateText: {
@@ -227,7 +296,7 @@ export default class MainScreen extends React.Component {
     };
 
     return (
-      <ContainerView ready={ready} style={styles.container}>
+      <ContainerView ready={ready} style={[styles.container, { backgroundColor: 'white' }]}>
         <ScrollView
           ref={this.scrollViewRef}
           // refreshControl={refreshControl}
@@ -235,84 +304,96 @@ export default class MainScreen extends React.Component {
           style={[styles.container, styles.scrollView]}
           contentContainerStyle={styles.scrollViewContent}
         >
-          <View style={[styles.shadow, styles.picker.container]}>
-            <View style={styles.picker.titleContainer}>
-              <MIcon name="map-marker" size={24} color={Colors.FUTABUS_PRIMARY} style={styles.picker.titleIcon} />
-              <View style={styles.container}>
-                <Text style={styles.picker.title}>Điểm khởi hành</Text>
-              </View>
-            </View>
-            {routePickerVisible && (
-              <CPPicker
-                pickerItems={routes}
-                itemValueFieldName="id"
-                itemLabelFieldName="name"
-                selectedValue={selectedRoute}
-                textStyle={{ paddingLeft: 10 }}
-                onValueChange={this.onValueChange('selectedRoute')}
-              />
-            )}
-            <View style={[styles.picker.titleContainer, { marginTop: 20 }]}>
-              <MIcon name="map-marker" size={24} color={Colors.FUTABUS_PRIMARY} style={styles.picker.titleIcon} />
-              <View style={styles.container}>
-                <Text style={styles.picker.title}>Điểm đến</Text>
-              </View>
-            </View>
-            {destinationRoutesLoading && <ActivityIndicator />}
-            {destinationRoutePickerVisible && (
-              <CPPicker
-                pickerItems={destinationRoutes}
-                itemValueFieldName="id"
-                itemLabelFieldName="name"
-                selectedValue={selectedDestinationRoute}
-                textStyle={{ paddingLeft: 10 }}
-                onValueChange={this.onValueChange('selectedDestinationRoute')}
-              />
-            )}
+          <View style={styles.FAQ.buttonContainer}>
+            <View style={styles.container} />
+            <TouchableRipple
+              rippleOpacity={0.2}
+              rippleColor={Colors.FUTABUS_PRIMARY}
+              rippleContainerBorderRadius={45 / 2}
+              style={[styles.shadow, styles.FAQ.touchable]}
+              onPress={this.onPressFAQ}
+            >
+              <MIcon name="help" size={32} color={Colors.FUTABUS_PRIMARY} />
+            </TouchableRipple>
+            {/* <TouchableRipple
+              rippleOpacity={0.2}
+              rippleColor={Colors.FUTABUS_PRIMARY}
+              rippleContainerBorderRadius={45 / 2}
+              style={[styles.shadow, styles.FAQ.touchable]}
+              onPress={this.onSearch}
+            >
+              <MIcon name="email-alert" size={28} color={Colors.FUTABUS_PRIMARY} />
+            </TouchableRipple> */}
           </View>
-          <View style={[styles.shadow, styles.picker.container, { marginVertical: 10 }]}>
-            <View style={styles.picker.titleContainer}>
-              <MIcon name="calendar-range" size={24} color={Colors.FUTABUS_PRIMARY} style={styles.picker.titleIcon} />
-              <View style={styles.container}>
-                <Text style={styles.picker.title}>Ngày khởi hành</Text>
+          <View style={[styles.container, { justifyContent: 'center' }]}>
+            <View style={[styles.shadow, styles.picker.container]}>
+              <View style={styles.picker.titleContainer}>
+                <MIcon name="map-marker" size={24} color={Colors.FUTABUS_PRIMARY} style={styles.picker.titleIcon} />
+                <View style={styles.container}>
+                  <Text style={styles.picker.title}>Start point</Text>
+                </View>
               </View>
+              {routePickerVisible && (
+                <CPPicker
+                  pickerItems={routes}
+                  itemValueFieldName="id"
+                  itemLabelFieldName="name"
+                  selectedValue={selectedRoute.id}
+                  textStyle={{ paddingLeft: 10 }}
+                  onValueChange={this.onValueChange('selectedRoute')}
+                />
+              )}
+              <View style={[styles.picker.titleContainer, { marginTop: 20 }]}>
+                <MIcon name="map-marker" size={24} color={Colors.FUTABUS_PRIMARY} style={styles.picker.titleIcon} />
+                <View style={styles.container}>
+                  <Text style={styles.picker.title}>Destination point</Text>
+                </View>
+              </View>
+              {destinationRoutesLoading && <ActivityIndicator />}
+              {destinationRoutePickerVisible && (
+                <CPPicker
+                  pickerItems={destinationRoutes}
+                  itemValueFieldName="id"
+                  itemLabelFieldName="name"
+                  selectedValue={selectedDestinationRoute.id}
+                  textStyle={{ paddingLeft: 10 }}
+                  onValueChange={this.onValueChange('selectedDestinationRoute')}
+                />
+              )}
+            </View>
+            <View style={[styles.shadow, styles.picker.container, { marginVertical: 10 }]}>
+              <View style={styles.picker.titleContainer}>
+                <MIcon name="calendar-range" size={24} color={Colors.FUTABUS_PRIMARY} style={styles.picker.titleIcon} />
+                <View style={styles.container}>
+                  <Text style={styles.picker.title}>Start date</Text>
+                </View>
+              </View>
+
+              <DatePicker
+                mode="date"
+                date={selectedDate}
+                showIcon={false}
+                format="DD-MM-YYYY"
+                cancelBtnText="Cancel"
+                confirmBtnText="Confirm"
+                placeholder="select date"
+                style={{ width: '100%' }}
+                maxDate={this.toDay.toDate()}
+                customStyles={datepickerCustomStyles}
+                onDateChange={this.onDateChange}
+              />
             </View>
 
-            <DatePicker
-              style={{ width: '100%' }}
-              date={selectedDate}
-              mode="date"
-              showIcon={false}
-              placeholder="select date"
-              format="DD-MM-YYYY"
-              minDate={this.toDay}
-              confirmBtnText="Confirm"
-              cancelBtnText="Cancel"
-              customStyles={datepickerCustomStyles}
-              onDateChange={this.onDateChange}
-            />
+            <TouchableRipple
+              rippleColor="white"
+              rippleOpacity={0.2}
+              rippleContainerBorderRadius={45 / 2}
+              style={[styles.shadow, styles.search.searchTouchable]}
+              onPress={this.onSearch}
+            >
+              <MIcon name="magnify" size={32} color="white" />
+            </TouchableRipple>
           </View>
-
-          <TouchableRipple
-            rippleColor="white"
-            rippleOpacity={0.2}
-            rippleContainerBorderRadius={45 / 2}
-            style={[styles.shadow, styles.search.searchTouchable]}
-            onPress={this.onSearch}
-          >
-            <MIcon name="magnify" size={32} color="white" />
-          </TouchableRipple>
-
-          <ContainerView ready={searchLoading === false} style={[styles.container, styles.shadow, styles.search.wrapper]}>
-            {searchResultVisible && (
-              <FlatList
-                data={searchResults}
-                keyExtractor={this.keyExtractor}
-                renderItem={this.renderSearchItem}
-                contentContainerStyle={styles.search.flatList}
-              />
-            )}
-          </ContainerView>
         </ScrollView>
       </ContainerView>
     );
@@ -320,5 +401,16 @@ export default class MainScreen extends React.Component {
 }
 
 MainScreen.propTypes = {
+  selectDate: PropTypes.func.isRequired,
+  selectEndPoint: PropTypes.func.isRequired,
+  selectStartPoint: PropTypes.func.isRequired,
   navigation: PropTypes.instanceOf(Object).isRequired,
 };
+
+const mapDispatchToProps = (dispatch) => ({
+  selectDate: (date) => dispatch({ type: ActionTypes.SELECT_DATE, date }),
+  selectEndPoint: (point) => dispatch({ type: ActionTypes.SELECT_END_POINT, point }),
+  selectStartPoint: (point) => dispatch({ type: ActionTypes.SELECT_START_POINT, point }),
+});
+
+export default connect(null, mapDispatchToProps)(MainScreen);

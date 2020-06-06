@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { ViewPropTypes } from 'react-native';
 import Touchable from 'react-native-material-ripple';
 
 const TouchableRipple = (props) => {
@@ -10,6 +11,7 @@ const TouchableRipple = (props) => {
 };
 
 TouchableRipple.propTypes = {
+  ...ViewPropTypes,
   disabled: PropTypes.bool,
   rippleColor: PropTypes.string,
   rippleCentered: PropTypes.bool,

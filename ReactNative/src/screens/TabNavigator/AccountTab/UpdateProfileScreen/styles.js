@@ -1,72 +1,51 @@
-import { Platform, StyleSheet } from 'react-native';
+import { StyleSheet } from 'react-native';
 import Colors from '../../../../utils/colors';
 
 const common = StyleSheet.create({
   container: { flex: 1 },
-  wrapper: {
-    paddingHorizontal: 10,
-    justifyContent: 'center',
-  },
-  shadow: {
-    elevation: 5,
-    shadowRadius: 3,
-    shadowOpacity: 0.25,
-    shadowColor: 'black',
-    shadowOffset: { width: 0, height: 3 },
-  },
-});
-
-const avatar = StyleSheet.create({
-  container: {
-    width: 150,
-    height: 150,
-    marginBottom: 20,
-    alignSelf: 'center',
-    borderRadius: 150 / 2,
-    backgroundColor: 'white',
-  },
-  image: {
-    width: 150,
-    height: 150,
-    borderRadius: 150 / 2,
-  },
 });
 
 const input = StyleSheet.create({
   container: {
-    marginBottom: 10,
-  },
-  inputNameText: {
-    fontSize: 16,
-    marginBottom: 3,
-  },
-  inputContainer: {
-    borderWidth: 1,
-    borderRadius: 5,
+    paddingVertical: 5,
     paddingHorizontal: 10,
-    borderColor: Colors.DARK_GRAY,
+  },
+  title: {
+    fontSize: 17,
+    paddingVertical: 5,
   },
   textInput: {
-    paddingVertical: Platform.OS === 'ios' ? 10 : undefined,
+    padding: 10,
+    borderWidth: 2,
+    borderRadius: 5,
+    fontWeight: '500',
+    borderColor: Colors.FUTABUS_PRIMARY,
+  },
+  datepicker: {
+    width: '100%',
+    borderWidth: 2,
+    borderRadius: 5,
+    borderColor: Colors.FUTABUS_PRIMARY,
   },
 });
 
 const submit = StyleSheet.create({
   touchable: {
+    margin: 12,
     padding: 12,
-    borderRadius: 5,
-    backgroundColor: Colors.PRIMARY,
+    borderRadius: 6,
+    alignItems: 'center',
+    backgroundColor: Colors.FUTABUS_PRIMARY,
   },
   text: {
+    fontSize: 16,
     color: 'white',
-    fontWeight: 'bold',
-    textAlign: 'center',
+    fontWeight: '700',
   },
 });
 
 export default {
   ...common,
   input,
-  avatar,
   submit,
 };

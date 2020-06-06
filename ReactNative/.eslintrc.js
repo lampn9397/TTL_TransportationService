@@ -2,6 +2,7 @@ module.exports = {
   root: true,
   extends: ['@react-native-community', 'airbnb'],
   rules: {
+    "radix": "off",
     "max-len": "off",
     "camelcase": "off",
     "no-plusplus": "off",
