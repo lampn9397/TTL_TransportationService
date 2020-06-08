@@ -3,8 +3,9 @@ package com.softech.cms.controller;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.Timestamp;
+import java.sql.Date;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -38,8 +39,10 @@ import com.softech.cms.exception.UserNotFoundException;
 import com.softech.cms.model.Customer;
 import com.softech.cms.model.Division;
 import com.softech.cms.model.Employee;
+import com.softech.cms.model.FAQ;
 import com.softech.cms.model.User;
 import com.softech.cms.service.CustomerService;
+import com.softech.cms.service.FAQService;
 import com.softech.cms.service.UserService;
 import com.softech.cms.util.Validators;
 
@@ -53,9 +56,15 @@ public class UserController {
 
 	@Autowired
 	private UserService userService;
+	
+	@Autowired
+	private FAQService faqService;
 
 	@Autowired
 	private CustomerService customerService;
+	
+//	@Autowired
+//	private DivisionSer customerService;
 
 	public static String MD5(String text) {
 		try {
@@ -76,7 +85,7 @@ public class UserController {
 	public static String randomCode() {
 		Random generator = new Random();
 
-		return "EMP" + generator.nextInt(9) + generator.nextInt(9) + generator.nextInt(9) + generator.nextInt(9)
+		return "" + generator.nextInt(9) + generator.nextInt(9) + generator.nextInt(9) + generator.nextInt(9)
 				+ generator.nextInt(9) + generator.nextInt(9);
 	}
 
@@ -109,36 +118,55 @@ public class UserController {
 		String username = requestBody.get("username").trim();
 		String password = requestBody.get("password").trim();
 
+		System.out.println(username);
+		System.out.println(password);
+
 		User user = userService.findByusername(username);
 
 		if (user == null) {
 			// Tài khoản không tồn tại
 			response.replace("status", "WARNING");
 			response.replace("message", "Thông tin đăng nhập không chính xác");
-		} else {
-			if (user.getPassword().equalsIgnoreCase(password) == false) {
-				// Sai mật khẩu
-				response.replace("status", "WARNING");
-				response.replace("message", "Sai mật khẩu");
-			} else {
-				HashMap<String, Object> data = new HashMap<>();
 
-				Division division = user.getDivisionid();
-				data.put("division", division);
-
-				Object userInfo = null;
-
-				if (division.getType().equals("CUSTOMER")) {
-					userInfo = user.getCusid();
-				} else {
-					userInfo = user.getEmpid();
-				}
-
-				data.put("user", userInfo);
-
-				response.replace("data", data);
-			}
+			return response;
 		}
+		if (user.getPassword().equalsIgnoreCase(password) == false) {
+			// Sai mật khẩu
+			response.replace("status", "WARNING");
+			response.replace("message", "Sai mật khẩu");
+
+			return response;
+		}
+
+		if (user.getStatus().equals("ACTIVE") == false && user.getStatus().equals("UPDATING") == false) {
+			response.put("status", user.getStatus());
+			if (user.getStatus().equals("INACTIVE")) {
+				response.put("message", "Tài khoản bị khóa !");
+			} else {
+				response.put("message", "");
+			}
+			response.put("data", null);
+
+			return response;
+		}
+
+		HashMap<String, Object> data = new HashMap<>();
+
+		Division division = user.getDivisionid();
+		data.put("division", division);
+
+		Object userInfo = null;
+
+		if (division.getType().equals("CUSTOMER")) {
+			userInfo = user.getCusid();
+		} else {
+			userInfo = user.getEmpid();
+		}
+
+		data.put("user", userInfo);
+		data.put("account", user);
+
+		response.replace("data", data);
 
 		return response;
 	}
@@ -150,12 +178,111 @@ public class UserController {
 		String password = requestBody.get("password").trim().toLowerCase();
 		String email = requestBody.get("email").trim();
 		try {
-			sendMail("lampn9397@gmail.com", "http://tranthuan1997.ddns.net/api/users/verify/"+random);
+			sendMail("lampn9397@gmail.com", "http://tranthuan1997.ddns.net/api/users/verify/" + random);
 		} catch (MessagingException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return MD5(password);
+	}
+
+	@PostMapping("/changePassword")
+	public HashMap<String, Object> changePassword(@RequestBody Map<String, String> requestBody) throws MessagingException {
+		HashMap<String, Object> response = new HashMap<>();
+		response.put("status", "SUCCESS");
+		response.put("message", "Đổi mật khẩu thành công !");
+		response.put("data", null);
+		
+		String accountId = requestBody.get("accountId").trim();
+		String password = requestBody.get("password").trim();
+		String newPassword = requestBody.get("newPassword").trim();
+		
+		Boolean pwd = newPassword.matches(Validators.PASSWORD_REGEX);
+		
+		User account = userService.findById(Integer.parseInt(accountId)).get();
+		String md5Password = MD5(password);
+		
+		if(account.getPassword().equals(md5Password) == false) {
+			response.put("status", "WARNING");
+			response.put("message", "Mật khẩu hiện tại không đúng !");
+			return response;
+		}
+		
+		if (pwd == false) {
+			response.replace("status", "WARNING");
+			response.replace("message",
+					"Mật khẩu không hợp lệ." + " Gồm các ký tự từ a-z, A-Z, 0-9, độ dài 7-20 ký tự."
+							+ " Không có ký tự đặc biệt &^#.~@!%*$_ và khoảng trắng.");
+			
+			return response;
+		}
+		
+		account.setPassword(MD5(newPassword));
+		userService.save(account);
+		response.put("data", account);
+		
+		return response;
+	}
+	
+	
+	@PostMapping("/update")
+	public Map<String, Object> update(@RequestBody Map<String, String> requestBody) throws MessagingException, ParseException {
+
+		HashMap<String, Object> response = new HashMap<>();
+		
+		HashMap<String, Object> data = new HashMap<>();
+		
+		response.put("status", "SUCCESS");
+		response.put("message", "Update thành công !");
+		response.put("data", null);
+
+		Integer customerId = Integer.parseInt(requestBody.get("customerId").trim());
+		Integer accountId = Integer.parseInt(requestBody.get("accountId").trim());
+		String address = requestBody.get("address").trim();
+		String phoneNumber = requestBody.get("phoneNumber").trim();
+		String idCard = requestBody.get("idCard").trim();
+		String birthday = requestBody.get("birthday").trim();
+		String gender = requestBody.get("gender");
+		
+		System.out.println(customerId);
+		System.out.println(accountId);
+		System.out.println(address);
+		System.out.println(phoneNumber);
+		System.out.println(idCard);
+		System.out.println(birthday);
+		System.out.println(gender);
+
+//		java.sql.Date sqlDate = new java.sql.Date(System.currentTimeMillis());
+
+		java.util.Date time = new SimpleDateFormat("dd/MM/yyyy").parse(birthday);
+		Date sqlDate =  new Date(time.getTime());
+		
+		User u = userService.findById(accountId).get();
+		
+		Division division = u.getDivisionid();
+		data.put("division", division);
+
+		Customer user = customerService.findById(customerId).get();
+		
+		user.setAddress(address);
+		user.setPhonenumber(phoneNumber);
+		user.setIdcard(idCard);
+		user.setBirthday(sqlDate);
+		user.setGender(gender);
+		
+		customerService.save(user);
+
+		User account = userService.findById(accountId).get();
+		account.setStatus("ACTIVE");
+		
+		userService.save(account);
+		
+		data.put("user", user);
+		data.put("account", account);
+		
+		response.replace("data", data);
+		
+		return response;
 	}
 
 	@PostMapping("/register")
@@ -175,10 +302,10 @@ public class UserController {
 		Boolean pwd = password.matches(Validators.PASSWORD_REGEX);
 		Boolean mail = email.matches(Validators.EMAIL_REGEX);
 
-		User user = userService.findByusername(username);
+		User u = userService.findByusername(username);
 		Customer customer = customerService.findByEmail(email);
 
-		if (user != null) {
+		if (u != null) {
 			// Tài khoản tồn tại
 			response.replace("status", "WARNING");
 			response.replace("message", "Tài khoản tồn tại");
@@ -211,47 +338,49 @@ public class UserController {
 
 					// Tạo thông tin người dùng
 
-					Customer createCustomer = new Customer();
+					Customer user = new Customer();
 
-					createCustomer.setAddress("");
-					createCustomer.setBirthday(sqlDate);
-					createCustomer.setCreateddate(sqlDate);
-					createCustomer.setEmail(email);
-					createCustomer.setFullname(fullname);
-					createCustomer.setGender("");
-					createCustomer.setPhonenumber("");
+					user.setAddress("");
+					user.setBirthday(sqlDate);
+					user.setCreateddate(sqlDate);
+					user.setEmail(email);
+					user.setFullname(fullname);
+					user.setGender("");
+					user.setPhonenumber("");
+					user.setIdcard(null);
 
-					customerService.save(createCustomer);
+					customerService.save(user);
 
 					// Tạo tài khoản
-					User createUser = new User();
+					User account = new User();
 
 					Division dId = new Division();
 					dId.setId(1);
 
 					Customer cId = new Customer();
-					cId.setId(createCustomer.getId());
+					cId.setId(user.getId());
 
-					createUser.setUsername(username);
-					createUser.setPassword(MD5(password));
-					createUser.setCreateddate(sqlDate);
-					createUser.setStatus("PENDING");
-					createUser.setCusid(cId);
-					createUser.setEmpid(null);
-					createUser.setDivisionid(dId);
-					createUser.setVerifycode(random);
+					account.setUsername(username);
+					account.setPassword(MD5(password));
+					account.setCreateddate(sqlDate);
+					account.setStatus("PENDING");
+					account.setCusid(cId);
+					account.setEmpid(null);
+					account.setDivisionid(dId);
+					account.setVerifycode(random);
 
-					userService.save(createUser);
+					userService.save(account);
 
-					data.put("Fullname", fullname);
-					data.put("Username", username);
-					data.put("Password", password);
-					data.put("Email", email);
+					data.put("user", user);
+					data.put("account", account);
+//					data.put("Password", password);
+//					data.put("Email", email);
+//					data.put("Status", "PENDING");
 
 					response.replace("data", data);
-					Thread t = new Thread(()-> {
+					Thread t = new Thread(() -> {
 						try {
-							sendMail(email, "http://tranthuan1997.ddns.net/api/users/verify/"+random);
+							sendMail(email, random);
 						} catch (MessagingException e) {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
@@ -265,28 +394,67 @@ public class UserController {
 		return response;
 	}
 
-	@RequestMapping(value = "/verify/{code}", method = RequestMethod.GET)
-	public Object verify(@PathVariable String code) {
+//	@RequestMapping(value = "/verify/{code}", method = RequestMethod.GET)
+//	public Object verify(@PathVariable String code) {
+//		User u = userService.findByVerifycode(code);
+//		
+//		if (u == null || u.getStatus().equals("PENDING") == false) {
+//			// Sai mã code
+//			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+//		}
+//		
+//		u.setStatus("ACTIVE");
+//		
+//		userService.save(u);
+//		
+//		HashMap<String, Object> response = new HashMap<>();
+//
+//		response.put("status", "SUCCESS");
+//		response.put("message", "Xác thực thành công");
+//		response.put("data", null);
+//		
+//		 ModelAndView modelAndView = new ModelAndView();
+//		modelAndView.setViewName("index");
+//		return modelAndView;
+//	}
+
+	@PostMapping("/verify")
+	public Map<String, Object> verify(@RequestBody Map<String, String> requestBody) {
+		HashMap<String, Object> response = new HashMap<>();
+		String code = requestBody.get("code");
+
 		User u = userService.findByVerifycode(code);
-		
+
 		if (u == null || u.getStatus().equals("PENDING") == false) {
 			// Sai mã code
-			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+			response.put("status", "WARNING");
+			response.put("message", "Xác thực không hợp lệ !");
+			response.put("data", null);
+
+			return response;
 		}
-		
-		u.setStatus("ACTIVE");
-		
+
+		u.setStatus("UPDATING");
+
 		userService.save(u);
-		
-		HashMap<String, Object> response = new HashMap<>();
 
 		response.put("status", "SUCCESS");
 		response.put("message", "Xác thực thành công");
 		response.put("data", null);
+
+		return response;
+	}
+	
+	@GetMapping("/faqs/get")
+	public Map<String, Object> faq() {
 		
-		 ModelAndView modelAndView = new ModelAndView();
-		modelAndView.setViewName("index");
-		return modelAndView;
+		HashMap<String, Object> response = new HashMap<>();
+		
+		response.put("status", "SUCCESS");
+		response.put("message", "");
+		response.put("data", faqService.findAll());
+		
+		return response;
 	}
 
 	@GetMapping("/get")

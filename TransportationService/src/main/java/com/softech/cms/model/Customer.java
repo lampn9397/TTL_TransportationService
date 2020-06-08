@@ -24,9 +24,10 @@ public class Customer implements Serializable {
 	private String gender;
 	private Date createddate;
 	private String email;
+	private String idcard;
 
 	public Customer(Integer id, String fullname, Date birthday, String address, String phonenumber, String gender,
-			Date createddate, String email) {
+			Date createddate, String email, String idcard) {
 //		super();
 		this.id = id;
 		this.fullname = fullname;
@@ -36,6 +37,7 @@ public class Customer implements Serializable {
 		this.gender = gender;
 		this.createddate = createddate;
 		this.email = email;
+		this.idcard = idcard;
 	}
 
 	public Customer() {
@@ -105,5 +107,15 @@ public class Customer implements Serializable {
 	public void setEmail(String email) {
 		this.email = email;
 	}
+
+	public String getIdcard() {
+		return idcard;
+	}
+
+	public void setIdcard(String idcard) {
+		this.idcard = idcard;
+	}
+	
+	
 
 }

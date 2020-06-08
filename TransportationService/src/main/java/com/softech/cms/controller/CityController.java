@@ -50,10 +50,10 @@ public class CityController {
 	private CityService cityService;
 
 
-	@PostMapping()
-	public City insert(@RequestBody City city) {
-		return cityService.save(city);
-	}
+//	@PostMapping()
+//	public City insert(@RequestBody City city) {
+//		return cityService.save(city);
+//	}
 
 	@GetMapping("/get")
 	public List<City> getAll() {

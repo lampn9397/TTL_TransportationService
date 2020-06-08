@@ -14,7 +14,7 @@ import org.hibernate.type.descriptor.sql.SmallIntTypeDescriptor;
 
 @Entity
 @Table(name = "tickets")
-public class Ticket implements Serializable{
+public class Ticket implements Serializable {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -22,31 +22,37 @@ public class Ticket implements Serializable{
 
 	private String ticketnumber;
 	private BigDecimal price;
-	private Integer tripid;
+	private Integer routeid;
 	private Date createddate;
-	private Integer seat;
+	private String seat;
 	private Integer vehicleid;
 	private Integer customerid;
 	private String status;
 	private Date datestart;
-	
+	private Integer routetimeid;
+	private String otp;
+	private Integer busstopid;
+
 	public Ticket() {
 //		super();
 	}
 
-	public Ticket(Integer id, String ticketnumber, BigDecimal price, Integer tripid, Date createddate, Integer seat,
-			Integer vehicleid, Integer customerid, String status, Date datestart) {
+	public Ticket(Integer id, String ticketnumber, BigDecimal price, Integer routeid, Date createddate, String seat,
+			Integer vehicleid, Integer customerid, String status, Date datestart, Integer routetimeid, String otp, Integer busstopid) {
 		super();
 		this.id = id;
 		this.ticketnumber = ticketnumber;
 		this.price = price;
-		this.tripid = tripid;
+		this.routeid = routeid;
 		this.createddate = createddate;
 		this.seat = seat;
 		this.vehicleid = vehicleid;
 		this.customerid = customerid;
 		this.status = status;
 		this.datestart = datestart;
+		this.routetimeid = routetimeid;
+		this.otp = otp;
+		this.busstopid = busstopid;
 	}
 
 	public Integer getId() {
@@ -73,12 +79,12 @@ public class Ticket implements Serializable{
 		this.price = price;
 	}
 
-	public Integer getTripid() {
-		return tripid;
+	public Integer getRouteid() {
+		return routeid;
 	}
 
-	public void setTripid(Integer tripid) {
-		this.tripid = tripid;
+	public void setRouteid(Integer routeid) {
+		this.routeid = routeid;
 	}
 
 	public Date getCreateddate() {
@@ -89,11 +95,11 @@ public class Ticket implements Serializable{
 		this.createddate = createddate;
 	}
 
-	public Integer getSeat() {
+	public String getSeat() {
 		return seat;
 	}
 
-	public void setSeat(Integer seat) {
+	public void setSeat(String seat) {
 		this.seat = seat;
 	}
 
@@ -129,5 +135,31 @@ public class Ticket implements Serializable{
 		this.datestart = datestart;
 	}
 
+	public Integer getRoutetimeid() {
+		return routetimeid;
+	}
+
+	public void setRoutetimeid(Integer routetimeid) {
+		this.routetimeid = routetimeid;
+	}
+
+	public String getOtp() {
+		return otp;
+	}
+
+	public void setOtp(String otp) {
+		this.otp = otp;
+	}
+
+	public Integer getBusstopid() {
+		return busstopid;
+	}
+
+	public void setBusstopid(Integer busstopid) {
+		this.busstopid = busstopid;
+	}
+		
 	
+	
+
 }

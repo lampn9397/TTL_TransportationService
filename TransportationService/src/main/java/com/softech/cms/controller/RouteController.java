@@ -1,5 +1,8 @@
 package com.softech.cms.controller;
 
+import java.sql.Date;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -19,10 +22,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.softech.cms.exception.UserNotFoundException;
+import com.softech.cms.model.BusStop;
 import com.softech.cms.model.Division;
 import com.softech.cms.model.Route;
+import com.softech.cms.model.TripCloseTime;
 import com.softech.cms.model.User;
+import com.softech.cms.service.BusStopService;
 import com.softech.cms.service.RouteService;
+import com.softech.cms.service.TripCloseTimeService;
 
 @RestController
 @CrossOrigin(origins = "*", allowedHeaders = "*")
@@ -31,11 +38,18 @@ public class RouteController {
 
 	@Autowired
 	private RouteService routeService;
+	
+	@Autowired
+	private BusStopService busStopService;
+	
+	@Autowired
+	private TripCloseTimeService closeTimeService;
 
-	@PostMapping()
-	public Route insert(@RequestBody Route user) {
-		return routeService.save(user);
-	}
+
+//	@PostMapping()
+//	public Route insert(@RequestBody Route user) {
+//		return routeService.save(user);
+//	}
 
 	@GetMapping("/get")
 	public List<Route> getAll() {
@@ -54,7 +68,6 @@ public class RouteController {
 		List<Route> route = routeService.findByStart(id);
 
 		if (route.size() == 0) {
-			// Tài khoản không tồn tại
 			response.replace("status", "WARNING");
 			response.put("message", "Không tồn tại !");
 		} else {
@@ -68,6 +81,60 @@ public class RouteController {
 		return response;
 	}
 
+	@PostMapping("/busStop")
+	public Map<String, Object> busStop(@RequestBody Map<String, String> requestBody) throws MessagingException {
+		HashMap<String, Object> response = new HashMap<>();
+
+		response.put("status", "SUCCESS");
+		response.put("data", null);
+
+		Integer cityid = Integer.valueOf(requestBody.get("id"));
+
+		List<BusStop> busStop = busStopService.findByCityid(cityid);
+
+		if (busStop.size() == 0) {
+			response.replace("status", "WARNING");
+			response.put("message", "Không tồn tại !");
+		} else {
+//			HashMap<String, Object> data = new HashMap<>();
+//
+//			data.put("routes", busStop);
+
+			response.replace("data", busStop);
+		}
+
+		return response;
+	}
+	
+	
+	@PostMapping("/searchRoute")
+	public Map<String, Object> searchRoute(@RequestBody Map<String, String> requestBody) throws MessagingException, ParseException {
+		HashMap<String, Object> response = new HashMap<>();
+
+		response.put("status", "SUCCESS");
+//		response.put("data", null);
+
+		Integer startid = Integer.valueOf(requestBody.get("startId"));
+		Integer endid = Integer.valueOf(requestBody.get("endId"));
+		String date = requestBody.get("date");
+		
+		java.util.Date time = new SimpleDateFormat("dd/MM/yyyy").parse(date);
+		Date sqlDate = new Date(time.getTime());
+		
+		Integer id = routeService.findByStartAndDestination(startid, endid).getId();
+		
+		TripCloseTime close = closeTimeService.findById(id).get();
+		
+		if(close.getClosedate().equals(sqlDate)) {
+			response.replace("status", "WARNING");
+			response.put("message", "không thể chọn ngày này !");
+		}else{
+			response.replace("status", "SUCCESS");
+		}
+
+		return response;
+	}
+	
 	@GetMapping("/{id}/get")
 	public Route findByid(@PathVariable Integer id) {
 		return routeService.findById(id).orElseThrow(() -> {
