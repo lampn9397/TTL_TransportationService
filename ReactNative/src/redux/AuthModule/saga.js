@@ -1,6 +1,7 @@
 import CryptoJS from 'crypto-js';
 import { Alert } from 'react-native';
 import { put, takeLeading } from 'redux-saga/effects';
+import { StackActions } from '@react-navigation/native';
 import AsyncStorage from '@react-native-community/async-storage';
 
 // Variables
@@ -366,9 +367,47 @@ function* AUTH_REGISTER_VERIFY_CODE(action) {
   yield put({ type: ActionTypes.AUTH_REGISTER_VERIFY_CODE_ERROR });
 }
 
+function* AUTH_FORGOT_PASSWORD(action) {
+  const alertModel = {
+    title: 'Forgot password',
+    message: 'Failed to reset password.',
+    buttons: [{ text: 'OK' }],
+    options: { cancelable: false },
+  };
+
+  try {
+    const { email } = action.data;
+
+    const response = yield apiAxios.post('/users/forgotPassword', { email });
+
+    alertModel.message = response.data.message;
+
+    if (response.data.status === apiResponse.status.SUCCESS) {
+      yield new Promise((resolve) => {
+        alertModel.buttons[0].onPress = resolve;
+
+        Alert.alert(alertModel.title, alertModel.message, alertModel.buttons, alertModel.options);
+      });
+
+      yield put({ type: ActionTypes.AUTH_FORGOT_PASSWORD_SUCCESS });
+
+      navigationRef.current.dispatch(StackActions.replace('Login'));
+
+      return;
+    }
+  } catch (error) {
+    console.log(error);
+  }
+
+  Alert.alert(alertModel.title, alertModel.message, alertModel.buttons, alertModel.options);
+
+  yield put({ type: ActionTypes.AUTH_FORGOT_PASSWORD_ERROR });
+}
+
 export default function* sagas() {
   yield takeLeading(ActionTypes.AUTH_LOGIN, AUTH_LOGIN);
   yield takeLeading(ActionTypes.AUTH_REGISTER, AUTH_REGISTER);
+  yield takeLeading(ActionTypes.AUTH_FORGOT_PASSWORD, AUTH_FORGOT_PASSWORD);
   yield takeLeading(ActionTypes.AUTH_REGISTER_VERIFY_CODE, AUTH_REGISTER_VERIFY_CODE);
   yield takeLeading(ActionTypes.AUTH_LOGOUT_HANDLING, AUTH_LOGOUT);
   yield takeLeading(ActionTypes.AUTH_UPDATE_PROFILE, AUTH_UPDATE_PROFILE);

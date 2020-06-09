@@ -12,9 +12,8 @@ import {
   TextInput,
   StatusBar,
   ScrollView,
-  TouchableHighlight,
-  KeyboardAvoidingView,
   ActivityIndicator,
+  KeyboardAvoidingView,
 } from 'react-native';
 
 // Components
@@ -25,11 +24,9 @@ import TouchableRipple from '../../../components/TouchableRipple';
 import styles from './styles';
 import ActionTypes from '../../../redux/AuthModule/action';
 
-const noop = () => null;
-
 const useNativeDriver = Platform.select({ ios: true, android: false });
 
-class LoginScreen extends React.Component {
+class ForgotPassword extends React.Component {
   scrollViewRef = React.createRef();
 
   headerVisibleAnimation = new Animated.Value(1);
@@ -37,10 +34,7 @@ class LoginScreen extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      username: __DEV__ ? 'lampn9397' : '',
-      password: __DEV__ ? 'Caothuvolam2' : '',
-      storeId: __DEV__ ? 'lampn@ames.edu.vn' : '',
-      secureTextEntry: true,
+      email: __DEV__ ? 'davidbull931997@gmail.com' : '',
     };
 
     if (Platform.OS === 'ios') {
@@ -83,7 +77,7 @@ class LoginScreen extends React.Component {
   }
 
   keyboardDidShow = () => {
-    this.scrollViewRef.current.scrollToEnd({ animated: true });
+    // this.scrollViewRef.current.scrollToEnd({ animated: true });
 
     Animated.timing(this.headerVisibleAnimation, {
       toValue: 0,
@@ -102,39 +96,21 @@ class LoginScreen extends React.Component {
     this.setState({ [fieldName]: text });
   }
 
-  toggleSecureTextEntry = (toggleState) => () => {
-    this.setState({ secureTextEntry: toggleState });
-  }
-
   onSubmit = () => {
-    const { username, password, storeId } = this.state;
-
-    const data = { username, password, storeId };
     // eslint-disable-next-line react/destructuring-assignment
-    this.props.login(data);
+    this.props.forgotPassword({ email: this.state.email });
   }
 
-  register = () => {
+  login = () => {
     const { navigation } = this.props;
 
-    navigation.replace('Register');
-  }
-
-  forgotPassword = () => {
-    const { navigation } = this.props;
-
-    navigation.replace('ForgotPassword');
+    navigation.replace('Login');
   }
 
   render = () => {
     const { loading } = this.props;
 
-    const {
-      // storeId,
-      username,
-      password,
-      secureTextEntry,
-    } = this.state;
+    const { email } = this.state;
 
     const customStyles = {
       headerContainer: {
@@ -155,7 +131,6 @@ class LoginScreen extends React.Component {
           <ContainerView ready style={styles.container}>
             <ScrollView
               ref={this.scrollViewRef}
-              // style={styles.container}
               keyboardDismissMode="interactive"
               keyboardShouldPersistTaps="handled"
               showsVerticalScrollIndicator={false}
@@ -170,49 +145,26 @@ class LoginScreen extends React.Component {
 
                 <Animated.View style={customStyles.headerContainer}>
                   <View>
-                    <Text style={styles.header.title}>Log in</Text>
+                    <Text style={styles.header.title}>Forgot password</Text>
                   </View>
                 </Animated.View>
-                <View>
-                  <Text style={styles.header.subTitle}>{'Welcome to Transportation Service.\nGet in to access your profile!'}</Text>
-                </View>
 
-                <View style={styles.input.container}>
-                  <MIcon name="account-circle" size={24} color="#2D9BDD" />
-                  <View style={styles.input.textInputContainer}>
-                    <TextInput
-                      value={username}
-                      autoCorrect={false}
-                      autoCapitalize="none"
-                      placeholder="Username"
-                      editable={loading === false}
-                      style={styles.input.textInput}
-                      onChangeText={this.onChangeText('username')}
-                    />
-                  </View>
+                <View>
+                  <Text style={styles.header.subTitle}>Enter account email to get reset password!</Text>
                 </View>
                 <View style={styles.input.container}>
-                  <MIcon name="shield-lock" size={24} color="#2D9BDD" />
+                  <MIcon name="email" size={24} color="#2D9BDD" />
                   <View style={styles.input.textInputContainer}>
                     <TextInput
-                      value={password}
+                      value={email}
                       autoCorrect={false}
                       autoCapitalize="none"
-                      placeholder="Password"
+                      placeholder="Email"
                       editable={loading === false}
                       style={styles.input.textInput}
-                      secureTextEntry={secureTextEntry}
-                      onChangeText={this.onChangeText('password')}
+                      onChangeText={this.onChangeText('email')}
                     />
                   </View>
-                  <TouchableHighlight
-                    underlayColor="transparent"
-                    onPress={noop}
-                    onPressIn={this.toggleSecureTextEntry(false)}
-                    onPressOut={this.toggleSecureTextEntry(true)}
-                  >
-                    <MIcon name="eye-circle" size={24} color="#2D9BDD" />
-                  </TouchableHighlight>
                 </View>
                 <TouchableRipple
                   rippleColor="white"
@@ -221,30 +173,20 @@ class LoginScreen extends React.Component {
                   style={styles.submit.touchable}
                   onPress={this.onSubmit}
                 >
-                  {loading === false && <Text style={styles.submit.text}>Log in</Text>}
+                  {loading === false && <Text style={styles.submit.text}>Get password</Text>}
                   {loading && <ActivityIndicator size={Platform.OS === 'ios' ? 'small' : 20} color="white" />}
                 </TouchableRipple>
+
                 <TouchableRipple
                   rippleColor="white"
                   rippleOpacity={0.1}
                   disabled={loading}
                   style={[styles.submit.touchable, { marginTop: 10 }]}
-                  onPress={this.register}
+                  onPress={this.login}
                 >
-                  {loading === false && <Text style={styles.submit.text}>Register</Text>}
+                  {loading === false && <Text style={styles.submit.text}>Go to Login</Text>}
                   {loading && <ActivityIndicator size={Platform.OS === 'ios' ? 'small' : 20} color="white" />}
                 </TouchableRipple>
-                <View style={styles.forgotPassword.container}>
-                  <TouchableRipple
-                    rippleColor="white"
-                    rippleOpacity={0.1}
-                    disabled={loading}
-                    style={[styles.forgotPassword.touchable, { marginTop: 10 }]}
-                    onPress={this.forgotPassword}
-                  >
-                    <Text style={styles.forgotPassword.text}>Forgot password?</Text>
-                  </TouchableRipple>
-                </View>
               </KeyboardAvoidingView>
             </ScrollView>
           </ContainerView>
@@ -254,9 +196,9 @@ class LoginScreen extends React.Component {
   }
 }
 
-LoginScreen.propTypes = {
-  login: PropTypes.func.isRequired,
+ForgotPassword.propTypes = {
   loading: PropTypes.bool.isRequired,
+  forgotPassword: PropTypes.func.isRequired,
   navigation: PropTypes.instanceOf(Object).isRequired,
 };
 
@@ -265,7 +207,7 @@ const mapStateToProps = (state) => ({
 });
 
 const mapDispatchToProps = (dispatch) => ({
-  login: (data) => dispatch({ type: ActionTypes.AUTH_LOGIN, data }),
+  forgotPassword: (data) => dispatch({ type: ActionTypes.AUTH_FORGOT_PASSWORD, data }),
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(LoginScreen);
+export default connect(mapStateToProps, mapDispatchToProps)(ForgotPassword);

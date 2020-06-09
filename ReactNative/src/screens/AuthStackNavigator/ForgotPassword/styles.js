@@ -14,9 +14,9 @@ const common = StyleSheet.create({
 
 const header = StyleSheet.create({
   title: {
-    fontSize: 55,
+    fontSize: 50,
     color: 'white',
-    marginBottom: 30,
+    // marginBottom: 30,
     fontFamily: Platform.select({
       android: 'Roboto',
       ios: 'Hiragino Sans',
@@ -69,24 +69,9 @@ const submit = StyleSheet.create({
   },
 });
 
-const forgotPassword = StyleSheet.create({
-  container: {
-    flexDirection: 'row',
-    justifyContent: 'flex-end',
-  },
-  touchable: {
-    padding: 10,
-  },
-  text: {
-    fontSize: 17,
-    color: 'white',
-  },
-});
-
 export default {
   ...common,
   input,
   submit,
   header,
-  forgotPassword,
 };

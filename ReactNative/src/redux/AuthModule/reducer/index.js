@@ -14,7 +14,6 @@ export default (state = defaultState, action) => {
         ...state,
         loading: true,
         loggedInUser: null,
-        error: null,
       };
     }
 
@@ -24,7 +23,6 @@ export default (state = defaultState, action) => {
         ready: true,
         loading: false,
         loggedInUser: action.loggedInUser,
-        error: null,
       };
     }
 
@@ -34,7 +32,6 @@ export default (state = defaultState, action) => {
         ready: true,
         loading: false,
         loggedInUser: null,
-        error: action.error,
       };
     }
 
@@ -43,7 +40,6 @@ export default (state = defaultState, action) => {
         ...state,
         loading: true,
         loggedInUser: null,
-        error: null,
       };
     }
 
@@ -52,7 +48,6 @@ export default (state = defaultState, action) => {
         ...state,
         loading: false,
         loggedInUser: action.loggedInUser,
-        error: null,
       };
     }
 
@@ -61,7 +56,27 @@ export default (state = defaultState, action) => {
         ...state,
         loading: false,
         loggedInUser: null,
-        error: action.error,
+      };
+    }
+
+    case ActionTypes.AUTH_FORGOT_PASSWORD: {
+      return {
+        ...state,
+        loading: true,
+      };
+    }
+
+    case ActionTypes.AUTH_FORGOT_PASSWORD_SUCCESS: {
+      return {
+        ...state,
+        loading: false,
+      };
+    }
+
+    case ActionTypes.AUTH_FORGOT_PASSWORD_ERROR: {
+      return {
+        ...state,
+        loading: false,
       };
     }
 
@@ -132,7 +147,6 @@ export default (state = defaultState, action) => {
         ready: true,
         loading: false,
         loggedInUser: null,
-        error: null,
       };
     }
 

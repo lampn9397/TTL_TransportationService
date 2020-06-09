@@ -1,6 +1,6 @@
 import Axios from 'axios';
 
-export const host = 'http://192.168.1.121';
+export const host = 'http://ed8999cdce8d.ngrok.io';
 
 export const userAxios = Axios.create({
   baseURL: `${host}/api/users`,
