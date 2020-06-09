@@ -1,11 +1,18 @@
 package com.softech.cms.controller;
 
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.security.Principal;
 import java.util.List;
+import java.util.Random;
 
+import javax.mail.MessagingException;
+import javax.mail.internet.MimeMessage;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Controller;
@@ -30,16 +37,92 @@ public class MainController {
 
 	@Autowired
 	private UserService userService;
-	
+
+	@Autowired
+	public JavaMailSender emailSender;
+
 	@Autowired
 	private CustomerService customerService;
+
+	public static String randomCode() {
+		Random generator = new Random();
+
+		return "" + generator.nextInt(9) + generator.nextInt(9) + generator.nextInt(9) + generator.nextInt(9)
+				+ generator.nextInt(9) + generator.nextInt(9);
+	}
+
+	public void sendMail2(String email, String code) throws MessagingException {
+		// Create a Simple MailMessage.
+		MimeMessage message = emailSender.createMimeMessage();
+
+		MimeMessageHelper helper = new MimeMessageHelper(message, "utf-8");
+
+		helper.setTo(email);
+		helper.setSubject("Forgot password");
+		helper.setText("Your new password is: " + code);
+
+		this.emailSender.send(message);
+	}
+
+	public static String MD5(String text) {
+		try {
+			MessageDigest md = MessageDigest.getInstance("MD5");
+			byte[] messageDigest = md.digest(text.getBytes());
+
+			StringBuffer sb = new StringBuffer();
+			for (int i = 0; i < messageDigest.length; i++) {
+				sb.append(Integer.toString((messageDigest[i] & 0xff) + 0x100, 16).substring(1));
+			}
+			return sb.toString();
+
+		} catch (NoSuchAlgorithmException e) {
+			throw new RuntimeException(e);
+		}
+	}
 
 	@RequestMapping(value = { "/", "/login" }, method = RequestMethod.GET)
 	public String loginPage(Model model) {
 		return "loginPage";
 	}
 
+	@RequestMapping(value = "/forgotPassword", method = RequestMethod.GET)
+	public String forgotPassword(Model model) {
+		return "forgotPasswordPage";
+	}
 
+	@RequestMapping(value = "/forgotPassword", method = RequestMethod.POST)
+	public String forgotPassword(Model model, @Valid String email) {
+		try {
+			
+			System.out.println(email.trim());
+			Customer user = customerService.findByEmail(email.trim());
+			System.out.println(user.getEmail());
+			if (user != null) {
+				try {
+					Customer customer = new Customer();
+					customer.setId(user.getId());
+					com.softech.cms.model.User account = userService.findByCusid(customer);
+
+					sendMail2(email.trim(), "New" + randomCode());
+					account.setPassword(MD5("New" + randomCode()));
+
+					userService.save(account);
+					model.addAttribute("success", "Your password is reset !");	
+					return "forgotPasswordPage";
+				} catch (MessagingException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+			// TODO: handle exception
+		}
+
+		model.addAttribute("error", "Your email does not exist !");
+		return "forgotPasswordPage";
+
+	}
 
 //	@RequestMapping(value = "accounts", method = RequestMethod.POST)
 //	public String editUser(@Valid String status, Model model) {
@@ -71,7 +154,6 @@ public class MainController {
 //         
 //        return "adminPage";
 //    }
-	
 
 //    @RequestMapping(value = "/login", method = RequestMethod.GET)
 //    public String loginPage(Model model) {
@@ -143,38 +225,35 @@ public class MainController {
 		return "403Page";
 	}
 
-	
 	// Account
 	@RequestMapping(value = "/accountTable", method = RequestMethod.GET)
 	public String accountTable(@Valid String status, Model model) {
-		
+
 		model.addAttribute("page", "/pages/accounts/accountTable");
 		model.addAttribute("users", userService.findAll());
 		return "dashboard";
 	}
-	
+
 	@RequestMapping(value = "/accountTable", method = RequestMethod.POST)
-	public String accountTable(
-			@Valid String status,
-			@Valid String division,
-			Model model, @RequestParam(value = "accountId", required = false) Integer id) {
-		if(status != null && division != null) {
+	public String accountTable(@Valid String status, @Valid String division, Model model,
+			@RequestParam(value = "accountId", required = false) Integer id) {
+		if (status != null && division != null) {
 			Division divisionId = new Division();
 			divisionId.setId(Integer.parseInt(division));
-			
+
 			com.softech.cms.model.User account = userService.findById(id).get();
-			
+
 			account.setDivisionid(divisionId);
 			account.setStatus(status);
-			
+
 			userService.save(account);
 		}
-		
+
 		model.addAttribute("page", "/pages/accounts/accountTable");
 		model.addAttribute("users", userService.findAll());
 		return "dashboard";
 	}
-	
+
 //  account edit
 
 	@RequestMapping(value = "/account/edit")
@@ -184,7 +263,7 @@ public class MainController {
 		model.addAttribute("page", "/pages/accounts/accountEdit");
 		return "dashboard";
 	}
-	
+
 	@RequestMapping(value = "/account/delete")
 	public String accountDelete(Model model, @RequestParam(value = "id", required = false) Integer id) {
 //		userService.deleteById(id);
@@ -192,75 +271,71 @@ public class MainController {
 		model.addAttribute("page", "/pages/accounts/accountTable");
 		return "redirect:/accountTable";
 	}
-	
+
 	// ---------------------------------------------------------------
 	// Users
-		@RequestMapping(value = "/userTable", method = RequestMethod.GET)
-		public String userTable(@Valid String status, Model model) {
-			
-			model.addAttribute("page", "/pages/users/userTable");
-			model.addAttribute("users", customerService.findAll());
-			List<Customer> user = (List<Customer>) customerService.findAll();
-			for (Customer customer : user) {
-				System.out.println(customer.getIdcard());
-			}
-			return "dashboard";
+	@RequestMapping(value = "/userTable", method = RequestMethod.GET)
+	public String userTable(@Valid String status, Model model) {
+
+		model.addAttribute("page", "/pages/users/userTable");
+		model.addAttribute("users", customerService.findAll());
+		List<Customer> user = (List<Customer>) customerService.findAll();
+		for (Customer customer : user) {
+			System.out.println(customer.getIdcard());
 		}
-		
-		@RequestMapping(value = "/userTable", method = RequestMethod.POST)
-		public String userTable( Model model, @RequestParam(value = "accountId", required = false) Integer id,
-				@Valid @ModelAttribute("appUserForm") Customer customer) {
-			
-			if(customer != null) {
-				customer.setId(id);
-				customerService.save(customer);
-			}
-			
-			model.addAttribute("page", "/pages/users/userTable");
-			model.addAttribute("users", customerService.findAll());
-			return "dashboard";
+		return "dashboard";
+	}
+
+	@RequestMapping(value = "/userTable", method = RequestMethod.POST)
+	public String userTable(Model model, @RequestParam(value = "accountId", required = false) Integer id,
+			@Valid @ModelAttribute("appUserForm") Customer customer) {
+
+		if (customer != null) {
+			customer.setId(id);
+			customerService.save(customer);
 		}
-		
-		
-		@RequestMapping(value = "/createUser", method = RequestMethod.GET)
-		public String createUser(@Valid String status, Model model) {
-			
-			model.addAttribute("page", "/pages/users/createUser");
-			
-			return "dashboard";
+
+		model.addAttribute("page", "/pages/users/userTable");
+		model.addAttribute("users", customerService.findAll());
+		return "dashboard";
+	}
+
+	@RequestMapping(value = "/createUser", method = RequestMethod.GET)
+	public String createUser(@Valid String status, Model model) {
+
+		model.addAttribute("page", "/pages/users/createUser");
+
+		return "dashboard";
+	}
+
+	@RequestMapping(value = "/user/create", method = RequestMethod.POST)
+	public String createUser(Model model, @Valid @ModelAttribute("appUserForm") Customer customer) {
+
+		java.sql.Date sqlDate = new java.sql.Date(System.currentTimeMillis());
+		if (customer != null) {
+			customer.setCreateddate(sqlDate);
+			customerService.save(customer);
 		}
-		
-		@RequestMapping(value = "/user/create", method = RequestMethod.POST)
-		public String createUser( Model model, @Valid @ModelAttribute("appUserForm") Customer customer) {
-			
-			java.sql.Date sqlDate = new java.sql.Date(System.currentTimeMillis());
-			if(customer != null) {
-				customer.setCreateddate(sqlDate);
-				customerService.save(customer);
-			}
-			
-			model.addAttribute("page", "/pages/users/userTable");
-			model.addAttribute("users", customerService.findAll());
-			return "redirect:/userTable";
-		}
-	
-		@RequestMapping(value = "/user/edit")
-		public String userEdit(Model model, @RequestParam(value = "id", required = false) Integer id) {
-			model.addAttribute("user", customerService.findById(id).get());
+
+		model.addAttribute("page", "/pages/users/userTable");
+		model.addAttribute("users", customerService.findAll());
+		return "redirect:/userTable";
+	}
+
+	@RequestMapping(value = "/user/edit")
+	public String userEdit(Model model, @RequestParam(value = "id", required = false) Integer id) {
+		model.addAttribute("user", customerService.findById(id).get());
 //			model.addAttribute("active", userService.findAll());
-			model.addAttribute("page", "/pages/users/userEdit");
-			return "dashboard";
-		}
-		
-		@RequestMapping(value = "/user/delete")
-		public String userDelete(Model model, @RequestParam(value = "id", required = false) Integer id) {
-			customerService.deleteById(id);
-			model.addAttribute("users", customerService.findAll());
-			model.addAttribute("page", "/pages/users/userTable");
-			return "redirect:/userTable";
-		}
-		
-		
-		
-		
+		model.addAttribute("page", "/pages/users/userEdit");
+		return "dashboard";
+	}
+
+	@RequestMapping(value = "/user/delete")
+	public String userDelete(Model model, @RequestParam(value = "id", required = false) Integer id) {
+		customerService.deleteById(id);
+		model.addAttribute("users", customerService.findAll());
+		model.addAttribute("page", "/pages/users/userTable");
+		return "redirect:/userTable";
+	}
+
 }

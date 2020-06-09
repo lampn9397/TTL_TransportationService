@@ -7,6 +7,7 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import com.softech.cms.model.Customer;
 import com.softech.cms.model.User;
 
 @Repository
@@ -20,4 +21,5 @@ public interface UserRepository extends CrudRepository<User,Integer> {
 	
 	public User findByusername(String username);
 	public User findByVerifycode(String code);
+	public User findByCusid(Customer cusid);
 }

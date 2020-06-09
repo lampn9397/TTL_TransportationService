@@ -6,6 +6,7 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.softech.cms.model.Customer;
 import com.softech.cms.model.User;
 import com.softech.cms.repository.UserRepository;
 
@@ -78,6 +79,13 @@ public class UserServiceImpl implements UserService {
 	public void deleteAll() {
 		userRepository.deleteAll();
 	}
+
+	@Override
+	public User findByCusid(Customer cusid) {
+		return userRepository.findByCusid(cusid);
+	}
+	
+	
 	
 	
 }

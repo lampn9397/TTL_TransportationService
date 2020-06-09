@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
+import com.softech.cms.model.Customer;
 import com.softech.cms.model.User;
 import com.softech.cms.repository.UserRepository;
 
@@ -35,7 +36,9 @@ public interface UserService {
 
 	User findByusername(String username);
 
-	User findByVerifycode(String code);	
+	User findByVerifycode(String code);
+
+	User findByCusid(Customer cusid);	
 
 	
 }

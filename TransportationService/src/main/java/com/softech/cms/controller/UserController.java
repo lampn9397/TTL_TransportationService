@@ -101,6 +101,19 @@ public class UserController {
 
 		this.emailSender.send(message);
 	}
+	
+	public void sendMail2(String email, String code) throws MessagingException {
+		// Create a Simple MailMessage.
+		MimeMessage message = emailSender.createMimeMessage();
+
+		MimeMessageHelper helper = new MimeMessageHelper(message, "utf-8");
+
+		helper.setTo(email);
+		helper.setSubject("Forgot password");
+		helper.setText("Your new password is: " + code);
+
+		this.emailSender.send(message);
+	}
 
 	@PostMapping()
 	public User insert(@RequestBody User user) {
@@ -224,6 +237,44 @@ public class UserController {
 		return response;
 	}
 	
+	@PostMapping("/forgotPassword")
+	public HashMap<String, Object> sendCodeToMail(@RequestBody Map<String, String> requestBody) throws MessagingException {
+		HashMap<String, Object> response = new HashMap<>();
+		response.put("status", "WARNING");
+		response.put("message", "Email không tồn tại!");
+		response.put("data", null);
+		
+		String email = requestBody.get("email").trim();
+		String random = randomCode();
+		System.out.println(email);
+		Customer user = customerService.findByEmail(email);
+		System.out.println(user.getEmail());
+		if(user != null) {
+			try {
+				Customer customer = new Customer();
+				customer.setId(user.getId());
+				
+				User account = userService.findByCusid(customer);
+				
+				sendMail2(email, "New"+random);
+				account.setPassword(MD5("New"+random));
+				
+				userService.save(account);
+				
+				response.put("status", "SUCCESS");
+				response.put("message", "Tạo mật khẩu mới thành công !");
+				
+				return response;
+			} catch (MessagingException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+			
+		}
+		
+		return response;
+	}
 	
 	@PostMapping("/update")
 	public Map<String, Object> update(@RequestBody Map<String, String> requestBody) throws MessagingException, ParseException {
