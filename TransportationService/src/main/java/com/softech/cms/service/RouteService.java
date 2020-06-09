@@ -38,6 +38,8 @@ public interface RouteService {
 
 	List<Route> findByStart(Integer id);
 
+	Route findByStartAndDestination(Integer start, Integer end);
+
 	
 	
 }

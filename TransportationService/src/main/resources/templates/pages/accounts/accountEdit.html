@@ -54,11 +54,25 @@
 									</select>
 								</div>
 							</div>
+							
+							<div class="form-group row">
+								<label class="control-label col-md-3 col-sm-3 label-align ">Status</label>
+								<div class="col-md-6 col-sm-6 ">
+									<select class="form-control" th:name="division">
+										<option th:value="${user.divisionid.id}">---
+											<p th:utext="${user.divisionid.name}"></p> ---
+										</option>
+										<option value="1">Khách hàng</option>
+										<option value="2">Nhân viên</option>
+										<option value="3">Quản trị viên</option>
+									</select>
+								</div>
+							</div>
 
 							<div class="ln_solid"></div>
 							<div class="item form-group">
 								<div class="col-md-6 col-sm-6 offset-md-3">
-									<a th:href="@{/table}" class="btn btn-primary" type="button">Cancel</a>
+									<a th:href="@{/accountTable}" class="btn btn-primary" type="button">Cancel</a>
 									<button class="btn btn-primary" type="reset">Reset</button>
 									<button type="submit" class="btn btn-success">Submit</button>
 								</div>

@@ -75,6 +75,11 @@ public class RouterServiceImpl implements RouteService {
 	public List<Route> findByStart(Integer id) {
 		return routeRepository.findByStart(id);
 	}
+
+	@Override
+	public Route findByStartAndDestination(Integer start, Integer end) {
+		return routeRepository.findByStartAndDestination(start, end);
+	}
 	
 	
 
