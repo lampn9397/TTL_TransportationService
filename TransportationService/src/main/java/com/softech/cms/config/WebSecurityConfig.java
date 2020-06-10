@@ -57,12 +57,18 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         http.authorizeRequests().antMatchers("/admin",
         		"/dashboard",
         		"/pages/userProfile",
+        		
         		"/pages/accounts/accountTable",
         		"/pages/accounts/accountEdit",
+        		
         		"/pages/users/userTable",
         		"/pages/users/userEdit",
         		"/pages/users/create",
-        		"/dashboard1",
+        		
+        		"/pages/faqs/faqTable",
+        		"/pages/faqs/createFAQ",
+        		
+        		
         		"/userProfile").access("hasRole('ROLE_ADMIN')");
  
         // Khi người dùng đã login, với vai trò XX.

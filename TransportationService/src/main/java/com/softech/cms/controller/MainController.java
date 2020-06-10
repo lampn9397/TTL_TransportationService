@@ -26,7 +26,9 @@ import org.springframework.web.servlet.ModelAndView;
 
 import com.softech.cms.model.Customer;
 import com.softech.cms.model.Division;
+import com.softech.cms.model.FAQ;
 import com.softech.cms.service.CustomerService;
+import com.softech.cms.service.FAQService;
 import com.softech.cms.service.UserService;
 import com.softech.cms.util.WebUtils;
 
@@ -37,6 +39,9 @@ public class MainController {
 
 	@Autowired
 	private UserService userService;
+	
+	@Autowired
+	private FAQService faqService;
 
 	@Autowired
 	public JavaMailSender emailSender;
@@ -94,9 +99,7 @@ public class MainController {
 	public String forgotPassword(Model model, @Valid String email) {
 		try {
 			
-			System.out.println(email.trim());
 			Customer user = customerService.findByEmail(email.trim());
-			System.out.println(user.getEmail());
 			if (user != null) {
 				try {
 					Customer customer = new Customer();
@@ -196,8 +199,6 @@ public class MainController {
 		// Sau khi user login thanh cong se co principal
 		String userName = principal.getName();
 
-		System.out.println("User Name: " + userName);
-
 		User loginedUser = (User) ((Authentication) principal).getPrincipal();
 
 		String userInfo = WebUtils.toString(loginedUser);
@@ -279,10 +280,6 @@ public class MainController {
 
 		model.addAttribute("page", "/pages/users/userTable");
 		model.addAttribute("users", customerService.findAll());
-		List<Customer> user = (List<Customer>) customerService.findAll();
-		for (Customer customer : user) {
-			System.out.println(customer.getIdcard());
-		}
 		return "dashboard";
 	}
 
@@ -337,5 +334,65 @@ public class MainController {
 		model.addAttribute("page", "/pages/users/userTable");
 		return "redirect:/userTable";
 	}
+	
+	
+	// ---------------------------------------------------------------
+		// FAQs
+		@RequestMapping(value = "/faqTable", method = RequestMethod.GET)
+		public String faqTable(@Valid String status, Model model) {
+
+			model.addAttribute("page", "/pages/faqs/faqTable");
+			model.addAttribute("faqs", faqService.findAll());
+			return "dashboard";
+		}
+
+		@RequestMapping(value = "/faqTable", method = RequestMethod.POST)
+		public String faqTable(Model model, @RequestParam(value = "faqId", required = false) Integer id,
+				@Valid @ModelAttribute("appFAQForm") FAQ faq) {
+
+			if (faq != null) {
+				faq.setId(id);
+				faqService.save(faq);
+			}
+
+			model.addAttribute("page", "/pages/faqs/faqTable");
+			model.addAttribute("faqs", faqService.findAll());
+			return "dashboard";
+		}
+
+		@RequestMapping(value = "/createFAQ", method = RequestMethod.GET)
+		public String createFAQ(@Valid String status, Model model) {
+
+			model.addAttribute("page", "/pages/faqs/createFAQ");
+
+			return "dashboard";
+		}
+
+		@RequestMapping(value = "/faq/create", method = RequestMethod.POST)
+		public String createFAQ(Model model, @Valid @ModelAttribute("appFAQForm") FAQ faq) {
+			if (faq != null) {
+				faqService.save(faq);
+			}
+
+			model.addAttribute("page", "/pages/faqs/faqTable");
+			model.addAttribute("faqs", faqService.findAll());
+			return "redirect:/faqTable";
+		}
+
+		@RequestMapping(value = "/faq/edit")
+		public String faqEdit(Model model, @RequestParam(value = "id", required = false) Integer id) {
+			model.addAttribute("faq", faqService.findById(id).get());
+//				model.addAttribute("active", userService.findAll());
+			model.addAttribute("page", "/pages/faqs/faqEdit");
+			return "dashboard";
+		}
+
+		@RequestMapping(value = "/faq/delete")
+		public String faqDelete(Model model, @RequestParam(value = "id", required = false) Integer id) {
+			faqService.deleteById(id);
+			model.addAttribute("faqs", faqService.findAll());
+			model.addAttribute("page", "/pages/faqs/faqTable");
+			return "redirect:/faqTable";
+		}
 
 }
