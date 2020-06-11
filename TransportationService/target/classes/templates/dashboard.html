@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<!-- Meta, title, CSS, favicons, etc. -->
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="images/favicon.ico" type="image/ico" />
+
+<title>Transportation Service</title>
+
+<link rel="stylesheet"
+	th:href="@{https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/css/all.min.css}">
+<link rel="stylesheet" type="text/css"
+	th:href="@{../preloading/css/style.css}">
+<link th:href="@{../materials/production/css/style.css}"
+	rel="stylesheet">
+
+<link
+	th:href="@{cdn.datatables.net/1.10.20/css/jquery.dataTables.min.css}">
+
+<!-- Bootstrap -->
+<link
+	th:href="@{../materials/vendors/bootstrap/dist/css/bootstrap.min.css}"
+	rel="stylesheet">
+<!-- Font Awesome -->
+<link
+	th:href="@{../materials/vendors/font-awesome/css/font-awesome.min.css}"
+	rel="stylesheet">
+<!-- NProgress -->
+<link th:href="@{../materials/vendors/nprogress/nprogress.css}"
+	rel="stylesheet">
+<!-- iCheck -->
+<link th:href="@{../materials/vendors/iCheck/skins/flat/green.css}"
+	rel="stylesheet">
+
+<!-- bootstrap-progressbar -->
+<link
+	th:href="@{../materials/vendors/bootstrap-progressbar/css/bootstrap-progressbar-3.3.4.min.css}"
+	rel="stylesheet">
+<!-- JQVMap -->
+<link th:href="@{../materials/vendors/jqvmap/dist/jqvmap.min.css}"
+	rel="stylesheet" />
+<!-- bootstrap-daterangepicker -->
+<link
+	th:href="@{../materials/vendors/bootstrap-daterangepicker/daterangepicker.css}"
+	rel="stylesheet">
+
+<!-- Custom Theme Style -->
+<link th:href="@{../materials/build/css/custom.min.css}"
+	rel="stylesheet">
+</head>
+
+<body class="nav-md preloading">
+
+	<!-- Hiệu ứng load -->
+	<!-- <div class="load">
+	<img th:src="@{../preloading/loader.gif}">
+</div> -->
+	<div class="loader">
+		<span class="fas fa-spinner xoay icon"></span>
+	</div>
+
+	<div class="container body content">
+		<div class="main_container">
+			<div class="col-md-3 left_col">
+				<div class="left_col scroll-view">
+					<div class="navbar nav_title" style="border: 0;">
+						<a th:href="@{/dashboard}" class="site_title"><i
+							class="fa fa-car"></i> <span style="font-size: 16px">Transportation
+								Service!</span></a>
+					</div>
+
+					<div class="clearfix"></div>
+
+					<!-- menu profile quick info -->
+					<div class="profile clearfix">
+						<div class="profile_info">
+							<a>Welcome, </a><span style="font-size: 21px" th:utext="${#request.userPrincipal.name}"></span>
+						</div>
+					</div>
+					<!-- /menu profile quick info -->
+
+					<br />
+
+					<!-- sidebar menu -->
+					<div id="sidebar-menu"
+						class="main_menu_side hidden-print main_menu">
+						<div class="menu_section">
+							<h3>General</h3>
+							<ul class="nav side-menu">
+								<li><a th:href="@{/dashboard}"><i class="fa fa-home"></i>
+										Home <span></span></a>
+								</li>
+								<li><a><i class="fa fa-table"></i> Tables <span
+										class="fa fa-chevron-down"></span></a>
+									<ul class="nav child_menu">
+										<li><a th:href="@{/accountTable}">Accounts</a></li>
+										<li><a th:href="@{/userTable}">Users</a></li>
+										<li><a th:href="@{/faqTable}">FAQs</a></li>
+										<li><a th:href="@{/cityTable}">Cities</a></li>
+									</ul></li>
+								
+							</ul>
+						</div>
+						
+
+					</div>
+					<!-- /sidebar menu -->
+
+					<!-- /menu footer buttons -->
+					<div class="sidebar-footer hidden-small">
+						<a data-toggle="tooltip" data-placement="top" title="Settings">
+							<span class="glyphicon glyphicon-cog" aria-hidden="true"></span>
+						</a> <a data-toggle="tooltip" data-placement="top" title="FullScreen">
+							<span class="glyphicon glyphicon-fullscreen" aria-hidden="true"></span>
+						</a> <a data-toggle="tooltip" data-placement="top" title="Lock"> <span
+							class="glyphicon glyphicon-eye-close" aria-hidden="true"></span>
+						</a> <a data-toggle="tooltip" data-placement="top" title="Logout"
+							href="login.html"> <span class="glyphicon glyphicon-off"
+							aria-hidden="true"></span>
+						</a>
+					</div>
+					<!-- /menu footer buttons -->
+				</div>
+			</div>
+
+			<!-- top navigation -->
+			<div class="top_nav">
+				<div class="nav_menu">
+					<div class="nav toggle">
+						<a id="menu_toggle"><i class="fa fa-bars"></i></a>
+					</div>
+					<nav class="nav navbar-nav">
+						<ul class=" navbar-right">
+							<li class="nav-item dropdown open" style="padding-left: 15px;">
+								<a href="javascript:;" class="user-profile dropdown-toggle"
+								aria-haspopup="true" id="navbarDropdown" data-toggle="dropdown"
+								aria-expanded="false"> <img src="images/img.jpg" alt=""
+									th:utext="${#request.userPrincipal.name}">
+							</a>
+								<div class="dropdown-menu dropdown-usermenu pull-right"
+									aria-labelledby="navbarDropdown">
+									<a class="dropdown-item" th:href="@{/profile}">Profile <i
+										class="fa fa-user pull-right"></i>
+									</a> <a class="dropdown-item" href="javascript:;"> <span
+										class="badge bg-red pull-right">50%</span> <span>Settings</span>
+									</a> <a class="dropdown-item" href="javascript:;">Help</a> <a
+										class="dropdown-item" th:if="${#request.userPrincipal != null}" th:href="@{/logout}"><i
+										class="fa fa-sign-out pull-right"></i> Log Out</a>
+								</div>
+							</li>
+
+							<li role="presentation" class="nav-item dropdown open"><a
+								href="javascript:;" class="dropdown-toggle info-number"
+								id="navbarDropdown1" data-toggle="dropdown"
+								aria-expanded="false"> <i class="fa fa-envelope-o"></i> <span
+									class="badge bg-green">6</span>
+							</a>
+								<ul class="dropdown-menu list-unstyled msg_list" role="menu"
+									aria-labelledby="navbarDropdown1">
+									<li class="nav-item"><a class="dropdown-item"> <span
+											class="image"><img src="images/img.jpg"
+												alt="Profile Image" /></span> <span> <span>John
+													Smith</span> <span class="time">3 mins ago</span>
+										</span> <span class="message"> Film festivals used to be
+												do-or-die moments for movie makers. They were where... </span>
+									</a></li>
+									<li class="nav-item"><a class="dropdown-item"> <span
+											class="image"><img src="images/img.jpg"
+												alt="Profile Image" /></span> <span> <span>John
+													Smith</span> <span class="time">3 mins ago</span>
+										</span> <span class="message"> Film festivals used to be
+												do-or-die moments for movie makers. They were where... </span>
+									</a></li>
+									<li class="nav-item"><a class="dropdown-item"> <span
+											class="image"><img src="images/img.jpg"
+												alt="Profile Image" /></span> <span> <span>John
+													Smith</span> <span class="time">3 mins ago</span>
+										</span> <span class="message"> Film festivals used to be
+												do-or-die moments for movie makers. They were where... </span>
+									</a></li>
+									<li class="nav-item"><a class="dropdown-item"> <span
+											class="image"><img src="images/img.jpg"
+												alt="Profile Image" /></span> <span> <span>John
+													Smith</span> <span class="time">3 mins ago</span>
+										</span> <span class="message"> Film festivals used to be
+												do-or-die moments for movie makers. They were where... </span>
+									</a></li>
+									<li class="nav-item">
+										<div class="text-center">
+											<a class="dropdown-item"> <strong>See All Alerts</strong>
+												<i class="fa fa-angle-right"></i>
+											</a>
+										</div>
+									</li>
+								</ul></li>
+						</ul>
+					</nav>
+				</div>
+			</div>
+			<!-- /top navigation -->
+
+			<!-- page content -->
+			<th:block th:include="${page}"></th:block>
+			<!-- /page content -->
+		</div>
+	</div>
+	
+	
+	<script type="text/javascript" th:src="@{../preloading/js/jquery-3.3.1.min.js}"></script>
+	<script type="text/javascript" th:src="@{../preloading/js/script.js}"></script>
+
+	<!-- jQuery -->
+	<script th:src="@{../materials/vendors/jquery/dist/jquery.min.js}"></script>
+	<!-- Bootstrap -->
+	<script
+		th:src="@{../materials/vendors/bootstrap/dist/js/bootstrap.bundle.min.js}"></script>
+	<!-- FastClick -->
+	<script th:src="@{../materials/vendors/fastclick/lib/fastclick.js}"></script>
+	<!-- NProgress -->
+	<script th:src="@{../materials/vendors/nprogress/nprogress.js}"></script>
+	<!-- Chart.js -->
+	<script th:src="@{../materials/vendors/Chart.js/dist/Chart.min.js}"></script>
+	<!-- gauge.js -->
+	<script th:src="@{../materials/vendors/gauge.js/dist/gauge.min.js}"></script>
+	<!-- bootstrap-progressbar -->
+	<script
+		th:src="@{../materials/vendors/bootstrap-progressbar/bootstrap-progressbar.min.js}"></script>
+	<!-- iCheck -->
+	<script th:src="@{../materials/vendors/iCheck/icheck.min.js}"></script>
+	<!-- Skycons -->
+	<script th:src="@{../materials/vendors/skycons/skycons.js}"></script>
+	<!-- Flot -->
+	<script th:src="@{../materials/vendors/Flot/jquery.flot.js}"></script>
+	<script th:src="@{../materials/vendors/Flot/jquery.flot.pie.js}"></script>
+	<script th:src="@{../materials/vendors/Flot/jquery.flot.time.js}"></script>
+	<script th:src="@{../materials/vendors/Flot/jquery.flot.stack.js}"></script>
+	<script th:src="@{../materials/vendors/Flot/jquery.flot.resize.js}"></script>
+	<!-- Flot plugins -->
+	<script
+		th:src="@{../materials/vendors/flot.orderbars/js/jquery.flot.orderBars.js}"></script>
+	<script
+		th:src="@{../materials/vendors/flot-spline/js/jquery.flot.spline.min.js}"></script>
+	<script
+		th:src="@{../materials/vendors/flot.curvedlines/curvedLines.js}"></script>
+	<!-- DateJS -->
+	<script th:src="@{../materials/vendors/DateJS/build/date.js}"></script>
+	<!-- JQVMap -->
+	<script th:src="@{../materials/vendors/jqvmap/dist/jquery.vmap.js}"></script>
+	<script
+		th:src="@{../materials/vendors/jqvmap/dist/maps/jquery.vmap.world.js}"></script>
+	<script
+		th:src="@{../materials/vendors/jqvmap/examples/js/jquery.vmap.sampledata.js}"></script>
+	<!-- bootstrap-daterangepicker -->
+	<script th:src="@{../materials/vendors/moment/min/moment.min.js}"></script>
+	<script
+		th:src="@{../materials/vendors/bootstrap-daterangepicker/daterangepicker.js}"></script>
+	<!-- morris.js -->
+	<script th:src="@{../materials/vendors/raphael/raphael.min.js}"></script>
+	<script th:src="@{../materials/vendors/morris.js/morris.min.js}"></script>
+
+	<!-- Datatables -->
+	<script
+		th:src="@{../materials/vendors/datatables.net/js/jquery.dataTables.min.js}"></script>
+	<script
+		th:src="@{../materials/vendors/datatables.net-bs/js/dataTables.bootstrap.min.js}"></script>
+	<script
+		th:src="@{../materials/vendors/datatables.net-buttons/js/dataTables.buttons.min.js}"></script>
+	<script
+		th:src="@{../materials/vendors/datatables.net-buttons-bs/js/buttons.bootstrap.min.js}"></script>
+	<script
+		th:src="@{../materials/vendors/datatables.net-buttons/js/buttons.flash.min.js}"></script>
+	<script
+		th:src="@{../materials/vendors/datatables.net-buttons/js/buttons.html5.min.js}"></script>
+	<script
+		th:src="@{../materials/vendors/datatables.net-buttons/js/buttons.print.min.js}"></script>
+	<script
+		th:src="@{../materials/vendors/datatables.net-fixedheader/js/dataTables.fixedHeader.min.js}"></script>
+	<script
+		th:src="@{../materials/vendors/datatables.net-keytable/js/dataTables.keyTable.min.js}"></script>
+	<script
+		th:src="@{../materials/vendors/datatables.net-responsive/js/dataTables.responsive.min.js}"></script>
+	<script
+		th:src="@{../materials/vendors/datatables.net-responsive-bs/js/responsive.bootstrap.js}"></script>
+	<script
+		th:src="@{../materials/vendors/datatables.net-scroller/js/dataTables.scroller.min.js}"></script>
+	<script th:src="@{../materials/vendors/jszip/dist/jszip.min.js}"></script>
+	<script th:src="@{../materials/vendors/pdfmake/build/pdfmake.min.js}"></script>
+	<script th:src="@{../materials/vendors/pdfmake/build/vfs_fonts.js}"></script>
+
+	<!-- Custom Theme Scripts -->
+	<script th:src="@{../materials/build/js/custom.min.js}"></script>
+
+</body>
+</html>
