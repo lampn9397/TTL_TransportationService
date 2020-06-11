@@ -24,9 +24,11 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.softech.cms.model.City;
 import com.softech.cms.model.Customer;
 import com.softech.cms.model.Division;
 import com.softech.cms.model.FAQ;
+import com.softech.cms.service.CityService;
 import com.softech.cms.service.CustomerService;
 import com.softech.cms.service.FAQService;
 import com.softech.cms.service.UserService;
@@ -42,6 +44,8 @@ public class MainController {
 	
 	@Autowired
 	private FAQService faqService;
+	@Autowired
+	private CityService cityService;
 
 	@Autowired
 	public JavaMailSender emailSender;
@@ -395,4 +399,62 @@ public class MainController {
 			return "redirect:/faqTable";
 		}
 
+		// ---------------------------------------------------------------
+				// FAQs
+				@RequestMapping(value = "/cityTable", method = RequestMethod.GET)
+				public String cityTable(@Valid String status, Model model) {
+
+					model.addAttribute("page", "/pages/cities/cityTable");
+					model.addAttribute("cities", cityService.findAll());
+					return "dashboard";
+				}
+
+				@RequestMapping(value = "/cityTable", method = RequestMethod.POST)
+				public String cityTable(Model model, @RequestParam(value = "cityId", required = false) Integer id,
+						@Valid @ModelAttribute("appCityForm") City city) {
+
+					if (city != null) {
+						city.setId(id);
+						cityService.save(city);
+					}
+
+					model.addAttribute("page", "/pages/cities/cityTable");
+					model.addAttribute("cities", cityService.findAll());
+					return "dashboard";
+				}
+
+				@RequestMapping(value = "/createCity", method = RequestMethod.GET)
+				public String createCity(@Valid String status, Model model) {
+
+					model.addAttribute("page", "/pages/cities/createCity");
+
+					return "dashboard";
+				}
+
+				@RequestMapping(value = "/city/create", method = RequestMethod.POST)
+				public String createCity(Model model, @Valid @ModelAttribute("appCityForm") City city) {
+					if (city != null) {
+						cityService.save(city);
+					}
+
+					model.addAttribute("page", "/pages/cities/cityTable");
+					model.addAttribute("cities", cityService.findAll());
+					return "redirect:/cityTable";
+				}
+
+				@RequestMapping(value = "/city/edit")
+				public String cityEdit(Model model, @RequestParam(value = "id", required = false) Integer id) {
+					model.addAttribute("city", cityService.findById(id).get());
+//						model.addAttribute("active", userService.findAll());
+					model.addAttribute("page", "/pages/cities/cityEdit");
+					return "dashboard";
+				}
+
+				@RequestMapping(value = "/city/delete")
+				public String cityDelete(Model model, @RequestParam(value = "id", required = false) Integer id) {
+					cityService.deleteById(id);
+					model.addAttribute("cities", cityService.findAll());
+					model.addAttribute("page", "/pages/cities/cityTable");
+					return "redirect:/cityTable";
+				}
 }

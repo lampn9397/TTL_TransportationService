@@ -68,6 +68,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         		"/pages/faqs/faqTable",
         		"/pages/faqs/createFAQ",
         		
+        		"/pages/cities/cityTable",
+        		"/pages/cities/createCity",
         		
         		"/userProfile").access("hasRole('ROLE_ADMIN')");
  
